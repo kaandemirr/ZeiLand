@@ -24,7 +24,11 @@ $installNote = @'
 '@
 
 $arguments = @('release', 'create', "v$version", $installer.FullName, '--repo', $Repository, '--target', $commit, '--title', "ZeiLand $version")
-# With --generate-notes, the --notes text goes above GitHub's list of changes.
-$arguments += if ($Notes) { @('--notes', "$installNote`n$Notes") } else { @('--notes', $installNote, '--generate-notes') }
-gh @arguments
+# The notes go through a file: Windows PowerShell splits an argument with quotes in it on the way to gh.
+# With --generate-notes, they go above GitHub's list of changes.
+$notesFile = Join-Path ([IO.Path]::GetTempPath()) "zeiland-notes-$version.md"
+[IO.File]::WriteAllText($notesFile, $(if ($Notes) { "$installNote`n$Notes" } else { $installNote }), (New-Object Text.UTF8Encoding $false))
+$arguments += @('--notes-file', $notesFile)
+if (-not $Notes) { $arguments += '--generate-notes' }
+try { gh @arguments } finally { Remove-Item $notesFile -ErrorAction SilentlyContinue }
 if ($LASTEXITCODE) { throw 'gh release create failed' }
