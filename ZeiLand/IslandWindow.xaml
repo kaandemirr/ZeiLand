@@ -1,0 +1,552 @@
+<Window x:Class="ZeiLand.IslandWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:controls="clr-namespace:ZeiLand.Controls"
+        Title="ZeiLand"
+        Width="472" Height="320"
+        WindowStyle="None" AllowsTransparency="True" Background="Transparent"
+        ResizeMode="NoResize" ShowInTaskbar="False" ShowActivated="False" Topmost="True"
+        WindowStartupLocation="Manual" Left="0" Top="0"
+        FontFamily="Segoe UI Variable Text, Segoe UI" FontSize="12.5" Foreground="White">
+
+    <Window.Resources>
+        <SolidColorBrush x:Key="SecondaryText" Color="#99FFFFFF" />
+        <SolidColorBrush x:Key="TertiaryText" Color="#66FFFFFF" />
+        <SolidColorBrush x:Key="Track" Color="#33FFFFFF" />
+        <SolidColorBrush x:Key="MicrophoneColor" Color="#FF9F0A" />
+        <SolidColorBrush x:Key="CameraColor" Color="#30D158" />
+        <SolidColorBrush x:Key="MutedColor" Color="#FF453A" />
+        <SolidColorBrush x:Key="TimerColor" Color="#FF9F0A" />
+
+        <Style x:Key="Icon" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
+            <Setter Property="FontSize" Value="15" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <!-- Microphone in use but muted: a small red crossed-out microphone instead of the orange dot.
+             Laid out as 6 px tall, like the dots, so nothing around it moves. -->
+        <Style x:Key="MutedMark" TargetType="TextBlock" BasedOn="{StaticResource Icon}">
+            <Setter Property="Text" Value="&#xF781;" />
+            <Setter Property="FontSize" Value="9" />
+            <Setter Property="Height" Value="10" />
+            <Setter Property="Margin" Value="1,-2" />
+            <Setter Property="Foreground" Value="{StaticResource MutedColor}" />
+            <Setter Property="Visibility" Value="Collapsed" />
+        </Style>
+
+        <!-- Header of the panels opened from the expanded island (back button + title). -->
+        <Style x:Key="BackButton" TargetType="Button">
+            <Setter Property="Width" Value="32" />
+            <Setter Property="Height" Value="30" />
+            <Setter Property="HorizontalAlignment" Value="Left" />
+            <Setter Property="ToolTip" Value="{DynamicResource Back}" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Surface" Background="Transparent" CornerRadius="15">
+                            <Path Stroke="White" StrokeThickness="1.8" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                  StrokeLineJoin="Round" Data="M6,0 L0,6 L6,12" HorizontalAlignment="Center"
+                                  VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="#1AFFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="PanelTitle" TargetType="TextBlock">
+            <Setter Property="Margin" Value="38,0,0,0" />
+            <Setter Property="FontSize" Value="14" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <!-- A full-width row in a panel's list (output devices). -->
+        <Style x:Key="ListRow" TargetType="Button">
+            <Setter Property="Height" Value="44" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Surface" Background="Transparent" CornerRadius="10" Padding="10,0">
+                            <ContentPresenter VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="#14FFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="#26FFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- The playing app's icon on the corner of the artwork. -->
+        <Style x:Key="SourceBadge" TargetType="Border">
+            <Setter Property="HorizontalAlignment" Value="Right" />
+            <Setter Property="VerticalAlignment" Value="Bottom" />
+            <Setter Property="Background" Value="Black" />
+            <Setter Property="Padding" Value="1.5" />
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="RenderOptions.BitmapScalingMode" Value="HighQuality" />
+        </Style>
+
+        <!-- Privacy indicators: orange = microphone in use, green = camera in use. -->
+        <Style x:Key="PrivacyDot" TargetType="Ellipse">
+            <Setter Property="Width" Value="6" />
+            <Setter Property="Height" Value="6" />
+            <Setter Property="Margin" Value="2,0" />
+        </Style>
+
+        <!-- Every state is a fixed-size panel, top-centred; the island shape clips it while morphing. -->
+        <Style x:Key="View" TargetType="Grid">
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Top" />
+            <Setter Property="Margin" Value="0,6,0,0" />
+            <Setter Property="Opacity" Value="0" />
+            <Setter Property="Visibility" Value="Collapsed" />
+            <Setter Property="RenderTransformOrigin" Value="0.5,0" />
+        </Style>
+
+        <Style x:Key="Glyph" TargetType="Path">
+            <Setter Property="Fill" Value="White" />
+            <Setter Property="Stroke" Value="White" />
+            <Setter Property="StrokeThickness" Value="1.5" />
+            <Setter Property="StrokeLineJoin" Value="Round" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+        </Style>
+
+        <!-- The seconds inside the back / ahead arrows. -->
+        <Style x:Key="SkipSeconds" TargetType="TextBlock">
+            <Setter Property="Text" Value="10" />
+            <Setter Property="FontSize" Value="7.5" />
+            <Setter Property="FontWeight" Value="SemiBold" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="HorizontalAlignment" Value="Center" />
+            <Setter Property="VerticalAlignment" Value="Center" />
+            <Setter Property="Margin" Value="0,1.5,0,0" />
+        </Style>
+
+        <!-- Bars grow from the bottom like Spotify's; per-bar ScaleTransforms are created in code. -->
+        <Style x:Key="LevelBar" TargetType="Rectangle">
+            <Setter Property="Width" Value="3" />
+            <Setter Property="Height" Value="14" />
+            <Setter Property="RadiusX" Value="1.5" />
+            <Setter Property="RadiusY" Value="1.5" />
+            <Setter Property="Margin" Value="1,0" />
+            <Setter Property="Fill" Value="White" />
+        </Style>
+
+        <Style x:Key="PillButton" TargetType="Button">
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="FontSize" Value="11.5" />
+            <Setter Property="Background" Value="#1FFFFFFF" />
+            <Setter Property="MinWidth" Value="76" />
+            <Setter Property="Height" Value="24" />
+            <Setter Property="Padding" Value="10,0" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Surface" Background="{TemplateBinding Background}" CornerRadius="12"
+                                Padding="{TemplateBinding Padding}" BorderBrush="#33FFFFFF" BorderThickness="0">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Surface" Property="BorderThickness" Value="1" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="IconButton" TargetType="Button">
+            <Setter Property="Width" Value="44" />
+            <Setter Property="Height" Value="38" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Surface" Background="Transparent" CornerRadius="19">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="#1AFFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="#33FFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Grid x:Name="Root">
+        <!-- While expanded, this practically invisible strip (alpha 1/255) fills the gap between the
+             screen edge and the island, so a pointer resting on the top edge still counts as hovering. -->
+        <Border x:Name="HoverBridge" Background="#01000000" />
+
+        <!-- The black background is clipped to the animated pill shape; everything outside is fully
+             transparent, so clicks pass through to the windows underneath. -->
+        <Grid x:Name="Island" Background="Black">
+
+            <!-- Resting: a slim tab hanging from the top edge (pushed partly off-window so only the
+                 rounded bottom shows). It stays out of the way of title bars and tabs, and the top
+                 screen edge makes it trivial to hit with the mouse. -->
+            <Grid x:Name="IdleView" Style="{StaticResource View}" Width="96" Height="10" Margin="0,-4,0,0"
+                  Opacity="1" Visibility="Visible">
+                <!-- Something is playing but the compact view stepped aside for the window underneath. -->
+                <Border x:Name="IdleLiveLine" Width="28" Height="2" CornerRadius="1" Margin="0,0,0,1.5"
+                        VerticalAlignment="Bottom" Background="White" Visibility="Collapsed" />
+            </Grid>
+
+            <!-- Something is playing: artwork, title, level meter. -->
+            <Grid x:Name="CompactMediaView" Style="{StaticResource View}" Width="260" Height="36">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Grid Margin="7,0,10,0" VerticalAlignment="Center">
+                    <Border x:Name="CompactArt" Width="24" Height="24" CornerRadius="7" />
+                    <Border Style="{StaticResource SourceBadge}" Width="13" Height="13" CornerRadius="4" Margin="0,0,-4,-4">
+                        <Image x:Name="CompactSourceIcon" />
+                    </Border>
+                </Grid>
+                <TextBlock x:Name="CompactTitle" Grid.Column="1" VerticalAlignment="Center"
+                           TextTrimming="CharacterEllipsis" Foreground="#E6FFFFFF" />
+                <StackPanel x:Name="CompactPrivacy" Grid.Column="2" Orientation="Horizontal" Margin="10,0,0,0"
+                            VerticalAlignment="Center" Background="Transparent" Visibility="Collapsed">
+                    <Ellipse x:Name="CompactMicDot" Style="{StaticResource PrivacyDot}" Fill="{StaticResource MicrophoneColor}" />
+                    <TextBlock x:Name="CompactMicMutedMark" Style="{StaticResource MutedMark}" />
+                    <Ellipse x:Name="CompactCameraDot" Style="{StaticResource PrivacyDot}" Fill="{StaticResource CameraColor}" />
+                </StackPanel>
+                <StackPanel x:Name="LevelBars" Grid.Column="3" Orientation="Horizontal" Margin="10,0,14,0"
+                            VerticalAlignment="Center">
+                    <Rectangle Style="{StaticResource LevelBar}" />
+                    <Rectangle Style="{StaticResource LevelBar}" />
+                    <Rectangle Style="{StaticResource LevelBar}" />
+                    <Rectangle Style="{StaticResource LevelBar}" />
+                </StackPanel>
+                <!-- A running timer takes the level bars' place. -->
+                <StackPanel x:Name="CompactMediaTimer" Grid.Column="3" Orientation="Horizontal" Margin="10,0,14,0"
+                            VerticalAlignment="Center" Visibility="Collapsed">
+                    <TextBlock Style="{StaticResource Icon}" FontSize="12" Text="&#xE916;" Foreground="{StaticResource TimerColor}" />
+                    <TextBlock x:Name="CompactMediaTimerText" Margin="5,0,0,0" FontWeight="SemiBold"
+                               Foreground="{StaticResource TimerColor}" Typography.NumeralAlignment="Tabular" />
+                </StackPanel>
+            </Grid>
+
+            <!-- A timer or stopwatch is running (and nothing is playing). -->
+            <Grid x:Name="CompactTimerView" Style="{StaticResource View}" Width="168" Height="36">
+                <TextBlock Style="{StaticResource Icon}" Margin="14,0,0,0" FontSize="15" Text="&#xE916;"
+                           HorizontalAlignment="Left" Foreground="{StaticResource TimerColor}" />
+                <TextBlock x:Name="CompactTimerText" Margin="0,0,16,0" HorizontalAlignment="Right" VerticalAlignment="Center"
+                           FontSize="14" FontWeight="SemiBold" Foreground="{StaticResource TimerColor}"
+                           Typography.NumeralAlignment="Tabular" />
+            </Grid>
+
+            <!-- Hovered while media is available: full player + system stats. -->
+            <Grid x:Name="ExpandedMediaView" Style="{StaticResource View}" Width="380" Height="216">
+                <Grid Margin="18,16,18,14">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid>
+                        <Grid Width="56" Height="56" HorizontalAlignment="Left">
+                            <Border x:Name="MediaArt" CornerRadius="12" />
+                            <Border Style="{StaticResource SourceBadge}" Width="21" Height="21" CornerRadius="6" Margin="0,0,-5,-5">
+                                <Image x:Name="MediaSourceIcon" />
+                            </Border>
+                        </Grid>
+                        <StackPanel Margin="70,0,0,0" VerticalAlignment="Center">
+                            <TextBlock x:Name="MediaTitle" FontSize="15" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                            <TextBlock x:Name="MediaArtist" Margin="0,2,0,0" Foreground="{StaticResource SecondaryText}"
+                                       TextTrimming="CharacterEllipsis" />
+                        </StackPanel>
+                    </Grid>
+
+                    <Grid x:Name="ProgressRow" Grid.Row="1" VerticalAlignment="Center">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40" />
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="40" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock x:Name="ElapsedText" FontSize="10.5" Foreground="{StaticResource TertiaryText}"
+                                   VerticalAlignment="Center" />
+                        <!-- Taller than the bar so it's easy to grab; click or drag to seek. -->
+                        <Grid x:Name="ProgressHitArea" Grid.Column="1" Height="16" Background="Transparent">
+                            <Border x:Name="ProgressTrack" Height="4" CornerRadius="2" Background="{StaticResource Track}"
+                                    VerticalAlignment="Center">
+                                <Border x:Name="ProgressFill" CornerRadius="2" Background="White" RenderTransformOrigin="0,0.5">
+                                    <Border.RenderTransform>
+                                        <ScaleTransform x:Name="ProgressScale" ScaleX="0" />
+                                    </Border.RenderTransform>
+                                </Border>
+                            </Border>
+                        </Grid>
+                        <TextBlock x:Name="RemainingText" Grid.Column="2" FontSize="10.5" Foreground="{StaticResource TertiaryText}"
+                                   TextAlignment="Right" VerticalAlignment="Center" />
+                    </Grid>
+
+                    <!-- Playback controls stay centred; the user's GIF (if any) sits at the left edge, the quick
+                         actions at the right. -->
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <controls:GifImage x:Name="MediaGif" HorizontalAlignment="Left" VerticalAlignment="Center"
+                                           Visibility="Collapsed" />
+                        <!-- Back / ahead only when they're on and the player can jump; the island widens to fit. -->
+                        <StackPanel x:Name="PlayerControls" Grid.Column="1" Orientation="Horizontal">
+                            <Button x:Name="SkipBackButton" Style="{StaticResource IconButton}" Width="34" Visibility="Collapsed">
+                                <Grid Width="22" Height="22">
+                                    <Path Stroke="White" StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                          Data="M11,3 A8,8 0 1 1 4.07,7" />
+                                    <Path Fill="White" Data="M7.6,3 L11.6,0.6 L11.6,5.4 Z" />
+                                    <TextBlock x:Name="SkipBackText" Style="{StaticResource SkipSeconds}" />
+                                </Grid>
+                            </Button>
+                            <Button x:Name="PreviousButton" Style="{StaticResource IconButton}" Width="40">
+                                <Path Style="{StaticResource Glyph}" Data="M0.5,0.5 H2.5 V13.5 H0.5 Z M17,0.5 L4.5,7 L17,13.5 Z" />
+                            </Button>
+                            <Button x:Name="PlayPauseButton" Style="{StaticResource IconButton}" Width="52" Margin="6,0">
+                                <Path x:Name="PlayPauseIcon" Style="{StaticResource Glyph}" Data="M1,0 L15,9 L1,18 Z" />
+                            </Button>
+                            <Button x:Name="NextButton" Style="{StaticResource IconButton}" Width="40">
+                                <Path Style="{StaticResource Glyph}" Data="M0.5,0.5 L13,7 L0.5,13.5 Z M15,0.5 H17 V13.5 H15 Z" />
+                            </Button>
+                            <Button x:Name="SkipForwardButton" Style="{StaticResource IconButton}" Width="34" Visibility="Collapsed">
+                                <Grid Width="22" Height="22">
+                                    <Path Stroke="White" StrokeThickness="1.6" StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                                          Data="M11,3 A8,8 0 1 0 17.93,7" />
+                                    <Path Fill="White" Data="M14.4,3 L10.4,0.6 L10.4,5.4 Z" />
+                                    <TextBlock x:Name="SkipForwardText" Style="{StaticResource SkipSeconds}" />
+                                </Grid>
+                            </Button>
+                        </StackPanel>
+                        <controls:QuickActions x:Name="MediaActions" Grid.Column="2" HorizontalAlignment="Right"
+                                               VerticalAlignment="Center" />
+                    </Grid>
+
+                    <controls:ShortcutBar x:Name="MediaShortcuts" Grid.Row="3" Margin="0,8,0,0" Visibility="Collapsed" />
+
+                    <controls:TimerStrip x:Name="MediaTimer" Grid.Row="4" Margin="0,8,0,0" Visibility="Collapsed" />
+
+                    <controls:StatsPanel x:Name="MediaStats" Grid.Row="5" Margin="0,8,0,0" />
+                </Grid>
+            </Grid>
+
+            <!-- Hovered with nothing playing: clock, date, battery + system stats. -->
+            <Grid x:Name="HomeView" Style="{StaticResource View}" Width="380" Height="146">
+                <Grid Margin="22,14,22,14">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <StackPanel x:Name="HomeClock" HorizontalAlignment="Left">
+                            <TextBlock x:Name="ClockText" FontSize="30" FontWeight="SemiBold" />
+                            <TextBlock x:Name="DateText" Margin="1,-2,0,0" FontSize="12" Foreground="{StaticResource SecondaryText}" />
+                        </StackPanel>
+                        <StackPanel x:Name="HomeTools" Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                            <StackPanel x:Name="HomeBattery" Orientation="Horizontal" Margin="0,0,12,0">
+                                <TextBlock x:Name="HomeBatteryText" VerticalAlignment="Center" Margin="0,0,8,0" />
+                                <controls:BatteryGlyph x:Name="HomeBatteryGlyph" Width="26" Height="13" VerticalAlignment="Center" />
+                            </StackPanel>
+                            <controls:QuickActions x:Name="HomeActions" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Grid>
+
+                    <controls:ShortcutBar x:Name="HomeShortcuts" Grid.Row="1" Margin="0,10,0,0" Visibility="Collapsed" />
+
+                    <controls:TimerStrip x:Name="HomeTimer" Grid.Row="2" Margin="0,10,0,0" Visibility="Collapsed" />
+
+                    <controls:StatsPanel x:Name="HomeStats" Grid.Row="4" />
+                </Grid>
+            </Grid>
+
+            <!-- Opened from the stats row: the apps using the most memory / CPU, with a close button each. -->
+            <Grid x:Name="OptimizeView" Style="{StaticResource View}" Width="380" Height="300">
+                <Grid Margin="12,10,16,12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <Grid>
+                        <Button x:Name="OptimizeBackButton" Style="{StaticResource BackButton}" />
+                        <TextBlock Style="{StaticResource PanelTitle}" Text="{DynamicResource OptimizeTitle}" />
+                        <TextBlock x:Name="OptimizeSummary" HorizontalAlignment="Right" VerticalAlignment="Center"
+                                   FontSize="11" Foreground="{StaticResource SecondaryText}" />
+                    </Grid>
+
+                    <StackPanel x:Name="OptimizeList" Grid.Row="1" Margin="4,8,0,0" />
+
+                    <TextBlock x:Name="OptimizeStatus" Grid.Row="2" Margin="4,0,0,0" FontSize="11"
+                               Foreground="{StaticResource TertiaryText}" TextTrimming="CharacterEllipsis" />
+                </Grid>
+            </Grid>
+
+            <!-- Opened from the quick actions: pick the output device. Height follows the device count. -->
+            <Grid x:Name="DevicesView" Style="{StaticResource View}" Width="380" Height="104">
+                <Grid Margin="12,10,12,12">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Button x:Name="DevicesBackButton" Style="{StaticResource BackButton}" />
+                        <TextBlock Style="{StaticResource PanelTitle}" Text="{DynamicResource SoundTitle}" />
+                        <StackPanel HorizontalAlignment="Right" VerticalAlignment="Center" Orientation="Horizontal">
+                            <Button x:Name="OutputsTab" Style="{StaticResource PillButton}" MinWidth="64"
+                                    Content="{DynamicResource OutputTab}" />
+                            <Button x:Name="InputsTab" Style="{StaticResource PillButton}" MinWidth="64" Margin="6,0,0,0"
+                                    Content="{DynamicResource InputTab}" />
+                        </StackPanel>
+                    </Grid>
+                    <ScrollViewer Grid.Row="1" Margin="0,8,0,0" VerticalScrollBarVisibility="Hidden" Focusable="False">
+                        <StackPanel x:Name="DevicesList" />
+                    </ScrollViewer>
+                </Grid>
+            </Grid>
+
+            <!-- Opened from the quick actions: start a countdown or a stopwatch. -->
+            <Grid x:Name="TimerPickerView" Style="{StaticResource View}" Width="380" Height="170">
+                <Grid Margin="12,10,16,14">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid>
+                        <Button x:Name="TimerBackButton" Style="{StaticResource BackButton}" />
+                        <TextBlock Style="{StaticResource PanelTitle}" Text="{DynamicResource TimerTitle}" />
+                    </Grid>
+                    <!-- Filled with the preset durations in code. -->
+                    <UniformGrid x:Name="TimerPresets" Grid.Row="1" Columns="4" Margin="4,10,0,0" VerticalAlignment="Top" />
+                    <Button x:Name="StopwatchButton" Grid.Row="2" Style="{StaticResource PillButton}" Height="30"
+                            Margin="8,0,4,0">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Style="{StaticResource Icon}" FontSize="12" Text="&#xE916;" Margin="0,0,7,0" />
+                            <TextBlock Text="{DynamicResource StartStopwatch}" VerticalAlignment="Center" />
+                        </StackPanel>
+                    </Button>
+                </Grid>
+            </Grid>
+
+            <!-- Transient: volume changed. -->
+            <Grid x:Name="VolumeView" Style="{StaticResource View}" Width="300" Height="40">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Canvas Width="18" Height="14" Margin="16,0,12,0" VerticalAlignment="Center">
+                    <Path Fill="White" Data="M0,4.5 H3.5 L8,0.5 V13.5 L3.5,9.5 H0 Z" />
+                    <Path x:Name="VolumeWaves" Stroke="White" StrokeThickness="1.4"
+                          StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                          Data="M10.5,4.5 Q12,7 10.5,9.5 M13,2 Q16,7 13,12" />
+                    <Path x:Name="MuteMark" Stroke="White" StrokeThickness="1.4" Visibility="Collapsed"
+                          StrokeStartLineCap="Round" StrokeEndLineCap="Round"
+                          Data="M11,4.5 L16,9.5 M16,4.5 L11,9.5" />
+                </Canvas>
+                <Border Grid.Column="1" Height="5" CornerRadius="2.5" Background="{StaticResource Track}" VerticalAlignment="Center">
+                    <Border CornerRadius="2.5" Background="White" RenderTransformOrigin="0,0.5">
+                        <Border.RenderTransform>
+                            <ScaleTransform x:Name="VolumeScale" ScaleX="0" />
+                        </Border.RenderTransform>
+                    </Border>
+                </Border>
+                <TextBlock x:Name="VolumeText" Grid.Column="2" MinWidth="36" Margin="10,0,16,0"
+                           TextAlignment="Right" VerticalAlignment="Center" />
+            </Grid>
+
+            <!-- Transient: charger plugged/unplugged or battery low. -->
+            <Grid x:Name="PowerView" Style="{StaticResource View}" Width="300" Height="40">
+                <controls:BatteryGlyph x:Name="PowerGlyph" Width="26" Height="13" Margin="16,0,0,0"
+                                       HorizontalAlignment="Left" VerticalAlignment="Center" />
+                <TextBlock x:Name="PowerText" Margin="54,0,0,0" VerticalAlignment="Center" />
+                <TextBlock x:Name="PowerPercent" HorizontalAlignment="Right" VerticalAlignment="Center"
+                           Margin="0,0,16,0" FontWeight="SemiBold" />
+            </Grid>
+
+            <!-- Transient: microphone muted/unmuted (from the island, the shortcut or a headset button). -->
+            <Grid x:Name="MicrophoneView" Style="{StaticResource View}" Width="300" Height="40">
+                <TextBlock x:Name="MicrophoneGlyph" Style="{StaticResource Icon}" Margin="17,0,0,0" HorizontalAlignment="Left" />
+                <TextBlock x:Name="MicrophoneText" Margin="46,0,0,0" VerticalAlignment="Center" />
+                <TextBlock x:Name="MicrophoneShortcut" HorizontalAlignment="Right" VerticalAlignment="Center"
+                           Margin="0,0,16,0" FontSize="11" Foreground="{StaticResource TertiaryText}" />
+            </Grid>
+
+            <!-- Transient: another output device became the default. -->
+            <Grid x:Name="OutputView" Style="{StaticResource View}" Width="300" Height="40">
+                <TextBlock x:Name="OutputGlyph" Style="{StaticResource Icon}" Margin="17,0,0,0" HorizontalAlignment="Left" />
+                <TextBlock x:Name="OutputName" Margin="46,0,18,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+            </Grid>
+
+            <!-- A word from the app itself, e.g. an update being installed. -->
+            <Grid x:Name="NoticeView" Style="{StaticResource View}" Width="300" Height="40">
+                <TextBlock x:Name="NoticeGlyph" Style="{StaticResource Icon}" Margin="17,0,0,0" HorizontalAlignment="Left" />
+                <TextBlock x:Name="NoticeText" Margin="46,0,18,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+            </Grid>
+
+            <!-- A countdown ended: stays until dismissed. -->
+            <Grid x:Name="TimerDoneView" Style="{StaticResource View}" Width="300" Height="48">
+                <TextBlock Style="{StaticResource Icon}" Margin="18,0,0,0" FontSize="17" Text="&#xEA8F;"
+                           HorizontalAlignment="Left" Foreground="{StaticResource TimerColor}" />
+                <StackPanel Margin="50,0,0,0" VerticalAlignment="Center">
+                    <TextBlock Text="{DynamicResource TimesUp}" FontWeight="SemiBold" />
+                    <TextBlock x:Name="TimerDoneDetail" FontSize="11" Foreground="{StaticResource SecondaryText}" />
+                </StackPanel>
+                <Button x:Name="TimerDoneButton" Style="{StaticResource PillButton}" Content="{DynamicResource Ok}" MinWidth="64"
+                        HorizontalAlignment="Right" Margin="0,0,12,0" />
+            </Grid>
+
+            <!-- Microphone / camera dots for every state except the compact player (which has its own).
+                 Moved to each state's spot in code; clipped to the island like everything else. -->
+            <StackPanel x:Name="PrivacyDots" Orientation="Horizontal" HorizontalAlignment="Center"
+                        VerticalAlignment="Top" Background="Transparent" Visibility="Collapsed">
+                <StackPanel.RenderTransform>
+                    <TranslateTransform x:Name="PrivacyOffset" />
+                </StackPanel.RenderTransform>
+                <Ellipse x:Name="MicDot" Style="{StaticResource PrivacyDot}" Fill="{StaticResource MicrophoneColor}" />
+                <TextBlock x:Name="MicMutedMark" Style="{StaticResource MutedMark}" />
+                <Ellipse x:Name="CameraDot" Style="{StaticResource PrivacyDot}" Fill="{StaticResource CameraColor}" />
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Window>

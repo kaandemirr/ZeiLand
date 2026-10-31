@@ -1,0 +1,18 @@
+ZeiLand uses the following third-party software.
+
+LibreHardwareMonitorLib
+  Reads the CPU temperature.
+  License: Mozilla Public License 2.0
+  Source:  https://github.com/LibreHardwareMonitor/LibreHardwareMonitor
+
+PawnIO
+  Kernel driver that LibreHardwareMonitorLib uses to read CPU sensors. The setup bundles the
+  unmodified, digitally signed official installer (PawnIO_setup.exe 2.2.0) and runs it only if
+  the user chooses to; it is not part of ZeiLand and is uninstalled separately.
+  License: GNU General Public License v2.0 (or later)
+  Source:  https://github.com/namazso/PawnIO and https://github.com/namazso/PawnIO.Setup
+  Website: https://pawnio.eu
+
+.NET runtime (included in the self-contained build)
+  License: MIT
+  Source:  https://github.com/dotnet/runtime and https://github.com/dotnet/wpf

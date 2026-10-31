@@ -1,0 +1,21 @@
+# Build output
+bin/
+obj/
+publish/
+*.user
+.vs/
+
+# AI assistant files stay local
+.claude/
+CLAUDE.md
+CLAUDE.local.md
+.mcp.json
+AGENTS.md
+.cursor/
+.cursorrules
+.aider*
+.github/copilot-instructions.md
+
+# Installer build output and the downloaded PawnIO setup (fetched by installer/build.ps1)
+installer/out/
+installer/vendor/

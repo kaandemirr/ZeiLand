@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net10.0-windows10.0.19041.0</TargetFramework>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <UseWPF>true</UseWPF>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <RootNamespace>ZeiLand</RootNamespace>
+    <AssemblyName>ZeiLand</AssemblyName>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Assets\island.ico</ApplicationIcon>
+    <Version>0.6.2</Version>
+
+    <!-- Keep the resident footprint small: workstation, non-concurrent GC (no background GC thread). -->
+    <ServerGarbageCollection>false</ServerGarbageCollection>
+    <ConcurrentGarbageCollection>false</ConcurrentGarbageCollection>
+    <SatelliteResourceLanguages>en;tr</SatelliteResourceLanguages>
+    <PublishReadyToRun>true</PublishReadyToRun>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Update="Assets\island.ico" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- CPU temperature (MPL-2.0); talks to the PawnIO driver. Only loaded once the temperature is shown. -->
+    <PackageReference Include="LibreHardwareMonitorLib" Version="0.9.6" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- .NET sizes the gen0 budget from the CPU's L3 cache. On big-cache CPUs (e.g. a 96 MB X3D) that lets
+         ~65 MB of garbage pile up between collections. A hard heap limit shrinks the budget to ~5 MB;
+         measured: peak private memory 117 MB -> 36 MB for the same allocation load. The island's live
+         managed data is well under 10 MB, so 64 MB leaves ample headroom. -->
+    <RuntimeHostConfigurationOption Include="System.GC.HeapHardLimit" Value="0x4000000" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,71 @@
+<UserControl x:Class="ZeiLand.Controls.TimerStrip"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             Height="36">
+
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="TimerColor" Color="#FF9F0A" />
+
+        <Style x:Key="StripButton" TargetType="Button">
+            <Setter Property="Height" Value="26" />
+            <Setter Property="MinWidth" Value="26" />
+            <Setter Property="Margin" Value="4,0,0,0" />
+            <Setter Property="Padding" Value="8,0" />
+            <Setter Property="Focusable" Value="False" />
+            <Setter Property="Cursor" Value="Hand" />
+            <Setter Property="Foreground" Value="White" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="Surface" Background="#1FFFFFFF" CornerRadius="13" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="#33FFFFFF" />
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="Surface" Property="Background" Value="#4DFFFFFF" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="IconText" TargetType="TextBlock">
+            <Setter Property="FontFamily" Value="Segoe Fluent Icons, Segoe MDL2 Assets" />
+            <Setter Property="FontSize" Value="11" />
+        </Style>
+    </UserControl.Resources>
+
+    <Border Background="#14FFFFFF" CornerRadius="12" Padding="10,0,5,0">
+        <Grid>
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Style="{StaticResource IconText}" FontSize="14" Text="&#xE916;" Foreground="{StaticResource TimerColor}"
+                       VerticalAlignment="Center" />
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="9,0,0,0" VerticalAlignment="Center">
+                <TextBlock x:Name="TimeText" FontSize="16" FontWeight="SemiBold" Foreground="{StaticResource TimerColor}"
+                           Typography.NumeralAlignment="Tabular" VerticalAlignment="Center" />
+                <TextBlock x:Name="LabelText" Margin="8,1,0,0" FontSize="11" Foreground="#66FFFFFF" VerticalAlignment="Center" />
+            </StackPanel>
+
+            <StackPanel Grid.Column="2" Orientation="Horizontal" VerticalAlignment="Center">
+                <Button x:Name="AddButton" Style="{StaticResource StripButton}" ToolTip="{DynamicResource AddMinute}">
+                    <TextBlock Text="{DynamicResource PlusMinute}" FontSize="11" />
+                </Button>
+                <Button x:Name="PauseButton" Style="{StaticResource StripButton}" Padding="0">
+                    <TextBlock x:Name="PauseGlyph" Style="{StaticResource IconText}" />
+                </Button>
+                <Button x:Name="StopButton" Style="{StaticResource StripButton}" Padding="0" ToolTip="{DynamicResource Stop}">
+                    <TextBlock Style="{StaticResource IconText}" Text="&#xE71A;" />
+                </Button>
+            </StackPanel>
+        </Grid>
+    </Border>
+</UserControl>
