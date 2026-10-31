@@ -2,6 +2,10 @@
 
 Windows 10/11 için hafif bir "Dynamic Island". Ekranın üst ortasında durur, olaylara göre şekil değiştirir. Türkçe ve İngilizce.
 
+<p align="center">
+  <img src="docs/images/player.png" width="640" alt="Açık ada: kapak, ilerleme, ileri / geri sarma, oynatma düğmeleri, hızlı düğmeler, kısayollar ve sistem bilgileri">
+</p>
+
 ## Kurulum
 
 `ZEIGARN-Setup-<sürüm>.exe` ([Sürümler](https://github.com/kaandemirr/ZeiLand/releases)) çalıştırılır.
@@ -19,6 +23,10 @@ Kurulum:
 
 ## Özellikler
 
+<p align="center">
+  <img src="docs/images/compact.png" width="560" alt="Mini oynatıcı: kapak, şarkı adı ve sese göre oynayan çubuklar">
+</p>
+
 | Durum | Ne zaman | Görünüm |
 |---|---|---|
 | Boşta | Hiçbir şey olmuyorken | Üst kenardan sarkan ince tutamak |
@@ -34,9 +42,16 @@ Kurulum:
 | Güç | Şarj takılıp çıkınca / pil %20 ve %10 | Pil simgesi + durum (1,8 sn) |
 | Süre doldu | Zamanlayıcı bitince | Zil + "Süre doldu", Windows alarm sesi; "Tamam"a basılana kadar kalır |
 
+<p align="center">
+  <img src="docs/images/home.png" width="560" alt="Ana ekran: saat, tarih, hızlı düğmeler, kısayollar, çalışan zamanlayıcı ve sistem bilgileri">
+</p>
+<p align="center">
+  <img src="docs/images/notices.png" alt="Bildirimler: ses seviyesi, mikrofon kapalı ve ses çıkışı">
+</p>
+
 - Adanın üzerinde **fare tekerleği** sesi açar veya kısar.
 - Tepsi simgesine **sol tık** ayarları açar. Ada'ya veya tepsi simgesine **sağ tık**, ayarlar penceresiyle aynı tarzda koyu bir menü açar: Ayarlar, Windows ile başlat (anahtar), Çıkış.
-- Tam ekran bir uygulama (oyun, video) açılınca ada **kendiliğinden gizlenir**.
+- Tam ekran bir uygulama (oyun, video) açılınca ada **kendiliğinden gizlenir** (Ayarlar → Davranış → Tam ekranda gizle). Bu kapatılırsa ada oyunun üstünde kalır; ama oyun "tam ekran" (exclusive) modundaysa Windows üstüne hiçbir pencere çizmez, oyunun "kenarlıksız" moda alınması gerekir.
 - Büyütülmüş bir pencere (ör. tarayıcı sekmeleri) adanın altına uzandığında kompakt oynatıcı varsayılan olarak görünür kalır. İstenirse (Ayarlar → Görünüm → İnce çizgi) **yer açar**: ince tutamağa döner, çalan bir şey varsa tutamakta kapak renginde (zamanlayıcıda turuncu) ince bir çizgi kalır. Üzerine gelince yine açılır.
 - **Ctrl + sürükle** adayı taşır: üst kenar boyunca ya da başka bir ekrana. Ortaya yaklaşınca yerine oturur. Konum, ekran ve genişliğin oranı olarak saklanır; çözünürlük veya ölçek değişse de yerinde kalır. Ekran çıkarılırsa ana ekrana döner.
 
@@ -61,9 +76,13 @@ Ayarlar → Görünüm'den bir GIF seçilir; açık oynatıcının sol altında,
 
 Ayarlar → AOD'den açılır (sağ tık menüsünde de anahtarı var). Siyah, kısık parlaklıkta tam ekranda büyük saat, tarih, çalan şarkı (oynat/duraklat ile), çalışan zamanlayıcı, pil ve mikrofon/kamera ışıkları; hangilerinin görüneceği seçilir.
 
+<p align="center">
+  <img src="docs/images/aod.png" width="640" alt="Always on display: büyük saat, tarih, çalan şarkı ve çalışan zamanlayıcı">
+</p>
+
 - **Ne zaman:** "Boşta kalınca" (1, 2, 5 ya da 10 dakika fare/klavye kullanılmayınca; fare oynayınca ya da bir tuşa basılınca kapanır) ya da "Hep açık" (ör. ikinci ekranda; çift tıklayınca kapanır).
 - **Ekran:** adanın ekranı, belirli bir ekran ya da hepsi (birden çok ekran varsa).
-- "Boşta kalınca", bırakılmış tam ekran bir oyunun üstüne de açılır; oyun kumandası (Xbox uyumlu) da girdi sayılır, kumandayla oynarken araya girmez. Tam ekran izlenen bir videonun (tarayıcı, Filmler ve TV, VLC, MPC, PotPlayer…) üstüne açılmaz. "Hep açık", tam ekran uygulamanın olduğu ekranı atlar; oyun bir ekrandayken diğer ekranda açık kalır. Odağı hiçbir zaman almaz.
+- "Boşta kalınca", bırakılmış tam ekran bir oyunun üstüne de açılır; oyun kumandası (Xbox uyumlu) da girdi sayılır, kumandayla oynarken araya girmez. Tam ekran izlenen bir videonun (tarayıcı, Filmler ve TV, VLC, MPC, PotPlayer…) üstüne açılmaz. Ekranı tek başına tutan (exclusive) tam ekran bir oyunun üstüne açılmaz; onun üstünde hiçbir pencere görünmez, oyunu tam ekrandan da düşürebilir. "Hep açık", tam ekran uygulamanın olduğu ekranı atlar; oyun bir ekrandayken diğer ekranda açık kalır. Odağı hiçbir zaman almaz.
 - Görünürken ekran kapanmaz (`SetThreadExecutionState`). İz kalmasın diye içerik dakikada bir birkaç piksel kayar.
 - Hafif: dakikada bir (zamanlayıcı çalışırken saniyede bir) yeniden çizilir. Boşluk beklenirken, birkaç dakikada bir tek bir zamanlayıcı çalışır (kumanda takılıysa ona iki saniyede bir bakılır); girdi yalnızca AOD görünürken sık izlenir.
 - "Önizle" düğmesi AOD'yi hemen gösterir.
@@ -82,7 +101,7 @@ Ayarlar penceresindeki her değişiklik anında uygulanır ve `%LOCALAPPDATA%\Ze
 - **Görünüm:** kapalıyken görünüm (mini oynatıcı / ince çizgi, resimli önizlemeyle), konum ("Ortaya al"), oynatıcıdaki GIF, ileri / geri sarma süresi (kapalı / 5 / 10 / 15 / 30 sn) ve hangi hızlı düğmelerin (zamanlayıcı / kronometre, ses giriş / çıkış, mikrofon) görüneceği.
 - **AOD:** yukarıdaki gibi.
 - **Kısayollar:** yukarıdaki gibi.
-- **Davranış:** açılma gecikmesi (anında / normal / yavaş), tekerlekle ses ve bir tıkın adımı (%1 / %2 / %5), mikrofon kısayolu (düğmeye basıp yeni tuşlara basılır; Esc vazgeçer, Geri tuşu kaldırır; başka bir uygulama kullanıyorsa uyarır), zamanlayıcı sesi, tam ekranda gizle, Windows ile başlat.
+- **Davranış:** açılma gecikmesi (anında / normal / yavaş), tekerlekle ses ve bir tıkın adımı (%1 / %2 / %5), mikrofon kısayolu (düğmeye basıp yeni tuşlara basılır; Esc vazgeçer, Geri tuşu kaldırır; başka bir uygulama kullanıyorsa uyarır), zamanlayıcı sesi, tam ekranda gizle (kapalıyken ada oyunun üstünde kalır; ama oyun "tam ekran" (exclusive) modundaysa üstünde hiçbir pencere görünmez, oyun "kenarlıksız" moda alınmalı, ör. LoL'de Ayarlar → Video → Pencere modu), Windows ile başlat.
 - **Hakkında:** sürüm, otomatik güncelleme, hoş geldin rehberi, lisans, ayarları sıfırla (kısayollar ve GIF kalır).
 
 ### Mikrofon ve kamera ışıkları
@@ -214,11 +233,12 @@ ZeiLand/
                            FullscreenWatcher, TrayIcon, Autostart, Elevation, Shortcuts, UpdateService, Displays, Gamepads
   Native/                  Win32, Core Audio, Media Foundation (kamera etkinliği), D3DKMT ve PDH tanımları
 installer/
-  ZeiLand.iss            Inno Setup betiği (ZEIGARN kurulumu)
+  ZeiLand.iss              Inno Setup betiği (ZEIGARN kurulumu)
   build.ps1                yayımla + PawnIO'yu indir/doğrula + paketle
   release.ps1              paketle + GitHub sürümü aç
   license-tr.txt, -en.txt  kurulumda kabul edilen koşullar (özet + MIT + gizlilik)
   THIRD-PARTY-NOTICES.txt  üçüncü taraf lisansları (kurulumla gelir)
+docs/images/               README görselleri (uygulamanın kendi çizimi, örnek içerikle)
 ```
 
 ## Lisans

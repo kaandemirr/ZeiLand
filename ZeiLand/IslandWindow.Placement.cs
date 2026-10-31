@@ -20,6 +20,13 @@ public partial class IslandWindow
     private bool _dragging;
     private int _dragOffset; // pointer minus the island's centre when the drag started, physical pixels
 
+    /// <summary>Back above the other always-on-top windows, e.g. a full-screen game that keeps itself on top too.</summary>
+    public void BringToTop()
+    {
+        var handle = new WindowInteropHelper(this).Handle;
+        if (handle != IntPtr.Zero) SetWindowPos(handle, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE);
+    }
+
     private void InitializePlacement()
     {
         Root.PreviewMouseLeftButtonDown += (_, e) =>

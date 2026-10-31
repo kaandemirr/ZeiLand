@@ -122,10 +122,17 @@ public partial class App : Application
         _updates.Installing += version => island.ShowNotice("", Loc.F("Updating", version), 4000);
         _updates.Start();
 
+        // A game in exclusive full screen (e.g. League of Legends' "Full screen" mode) shows nothing over it
+        // whatever we do; in a borderless one the island stays on top.
         void UpdateIslandVisibility()
         {
-            if (_fullscreen.IsFullscreen && settings.HideInFullscreen) island.Hide();
-            else island.Show();
+            if (_fullscreen.IsFullscreen && settings.HideInFullscreen)
+            {
+                island.Hide();
+                return;
+            }
+            island.Show();
+            if (_fullscreen.IsFullscreen) island.BringToTop();
         }
         _fullscreen.Changed += _ => UpdateIslandVisibility();
         settings.PropertyChanged += (_, args) =>

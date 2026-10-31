@@ -26,6 +26,7 @@ internal static class NativeMethods
 
     public static readonly IntPtr HWND_TOPMOST = new(-1);
     public const uint SWP_NOSIZE = 0x0001;
+    public const uint SWP_NOMOVE = 0x0002;
     public const uint SWP_NOACTIVATE = 0x0010;
     public const uint MONITOR_DEFAULTTOPRIMARY = 1;
     public const uint MONITOR_DEFAULTTONEAREST = 2;
@@ -248,6 +249,12 @@ internal static class NativeMethods
 
     [DllImport("shell32.dll")]
     public static extern nuint SHAppBarMessage(uint message, ref APPBARDATA data);
+
+    /// <summary>A full-screen Direct3D app has the screen to itself (exclusive mode): no window shows over it.</summary>
+    public const int QUNS_RUNNING_D3D_FULL_SCREEN = 3;
+
+    [DllImport("shell32.dll")]
+    public static extern int SHQueryUserNotificationState(out int state);
 
     public const int PROCESS_QUERY_LIMITED_INFORMATION = 0x1000;
 

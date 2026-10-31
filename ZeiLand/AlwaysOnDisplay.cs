@@ -204,12 +204,18 @@ internal sealed class AlwaysOnDisplay : IDisposable
             { } device when displays.Any(d => d.Device == device) => displays.Where(d => d.Device == device).ToList(),
             _ => displays.Where(d => d.Device == (Displays.Find(_settings.IslandMonitor)?.Device)).ToList(),
         };
-        // Waiting for idle, a full-screen game left alone gets covered too, a video being watched doesn't.
+        // Waiting for idle, a full-screen game left alone gets covered too, a video being watched doesn't, nor a
+        // game holding the screen exclusively (nothing shows over it, and trying may knock it out of full screen).
         // "Always" stays off that screen: someone is playing or watching there.
         var (window, covered) = FullscreenApp();
-        if (covered == IntPtr.Zero || (_settings.AodTrigger == AodTrigger.Idle && !IsPlayingVideo(window))) return chosen;
+        if (covered == IntPtr.Zero
+            || (_settings.AodTrigger == AodTrigger.Idle && !IsPlayingVideo(window) && !IsExclusiveFullscreen()))
+            return chosen;
         return chosen.Where(d => d.Handle != covered).ToList();
     }
+
+    private static bool IsExclusiveFullscreen() =>
+        SHQueryUserNotificationState(out int state) == 0 && state == QUNS_RUNNING_D3D_FULL_SCREEN;
 
     /// <summary>
     /// Whether a full-screen app is showing a video: it's playing media itself (a browser, Films &amp; TV),
