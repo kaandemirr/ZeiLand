@@ -1,251 +1,253 @@
 # ZeiLand
 
-Windows 10/11 için hafif bir "Dynamic Island". Ekranın üst ortasında durur, olaylara göre şekil değiştirir. Türkçe ve İngilizce.
+**English** | [Türkçe](README.tr.md)
+
+A lightweight "Dynamic Island" for Windows 10/11. It sits at the top centre of the screen and changes shape with what is happening. In English and Turkish.
 
 <p align="center">
-  <img src="docs/images/player.png" width="640" alt="Açık ada: kapak, ilerleme, ileri / geri sarma, oynatma düğmeleri, hızlı düğmeler, kısayollar ve sistem bilgileri">
+  <img src="docs/images/en/player.png" width="640" alt="The open island: cover, progress, skip back / ahead, playback buttons, quick buttons, shortcuts and system stats">
 </p>
 
-## Kurulum
+## Installing
 
-`ZEIGARN-Setup-<sürüm>.exe` ([Sürümler](https://github.com/zeigarn/ZeiLand/releases)) çalıştırılır.
+Run `ZEIGARN-Setup-<version>.exe` (from [Releases](https://github.com/zeigarn/ZeiLand/releases)).
 
-> **"Windows kişisel bilgisayarınızı korudu" derse:** **Ek bilgi → Yine de çalıştır**. Kurulum dosyası kod imzalı olmadığı için Windows SmartScreen ilk kurulumda bu uyarıyı gösterir; virüs uyarısı değildir. İstenirse önce dosyaya sağ tık → Özellikler → **Engellemeyi kaldır** işaretlenir, uyarı hiç çıkmaz. Güncellemeler bu uyarı olmadan, sessizce kurulur.
+> **If Windows says "Windows protected your PC":** click **More info → Run anyway**. The setup isn't code-signed, so Windows SmartScreen shows this on the first install; it isn't a virus warning. To avoid it entirely, right-click the file → Properties → tick **Unblock** first. Updates install silently, without this warning.
 
-Kurulum:
+The setup:
 
-- Windows Türkçeyse Türkçe, değilse İngilizce açılır. Önce kullanım koşullarını gösterir (özet, MIT lisansı, gizlilik notu); kabul edilince devam eder.
-- ZeiLand'i `Program Files\ZEIGARN\ZeiLand` altına kurar (.NET içinde gelir, ayrıca bir şey gerekmez) ve Başlat menüsüne ekler.
-- İstenirse **PawnIO** sürücüsünü kurar (CPU sıcaklığı için; zaten kuruluysa bu seçenek görünmez).
-- İstenirse **Windows ile başlat**: oturum açılınca ada UAC sormadan yönetici olarak başlar.
-- Kaldırırken uygulamayı kapatır ve başlangıç görevini siler. Ayarlar (`%LOCALAPPDATA%\ZeiLand`) ve PawnIO yerinde kalır; PawnIO "Uygulamalar" listesinden ayrıca kaldırılır.
-- İlk açılışta kısa bir **hoş geldin rehberi** çıkar (ipuçları, Windows ile başlat ve otomatik güncelleme seçimi). Sonradan Ayarlar → Hakkında'dan açılır.
+- Opens in Turkish if Windows is in Turkish, otherwise in English. It first shows the terms (a summary, the MIT license and a privacy note) and continues once they are accepted.
+- Installs ZeiLand under `Program Files\ZEIGARN\ZeiLand` (.NET comes with it, nothing else is needed) and adds it to the Start menu.
+- Optionally installs the **PawnIO** driver (for the CPU temperature; the option is hidden if it is already installed).
+- Optionally sets up **Start with Windows**: the island starts as administrator at sign-in, without a UAC prompt.
+- When uninstalling, it closes the app and removes the startup task. Settings (`%LOCALAPPDATA%\ZeiLand`) and PawnIO stay; PawnIO is removed separately from the Apps list.
+- On first launch a short **welcome guide** appears (tips, Start with Windows and automatic updates). It can be opened again from Settings → About.
 
-## Özellikler
+## Features
 
 <p align="center">
-  <img src="docs/images/compact.png" width="560" alt="Mini oynatıcı: kapak, şarkı adı ve sese göre oynayan çubuklar">
+  <img src="docs/images/en/compact.png" width="560" alt="Mini player: cover, song title and bars moving with the sound">
 </p>
 
-| Durum | Ne zaman | Görünüm |
+| State | When | Looks like |
 |---|---|---|
-| Boşta | Hiçbir şey olmuyorken | Üst kenardan sarkan ince tutamak |
-| Çalan medya | Spotify, tarayıcı vb. çalarken | Albüm kapağı (köşesinde çalan uygulamanın simgesi) + başlık + çalan sese göre oynayan çubuklar (kapak renginde) |
-| Zamanlayıcı | Zamanlayıcı / kronometre çalışırken | Turuncu kronometre simgesi + kalan / geçen süre. Müzik de çalıyorsa çubukların yerinde |
-| Genişlemiş oynatıcı | Fareyle üzerine gelince (medya varsa) | Kapak, başlık, sanatçı, ilerleme (tıklayıp sürükleyerek sarılır), ⟲10 ⏮ ⏯ ⏭ 10⟳, hızlı düğmeler + sistem bilgileri |
-| Ana ekran | Fareyle üzerine gelince (medya yoksa) | Saat, tarih, pil, hızlı düğmeler + sistem bilgileri |
-| Optimize | Sistem bilgilerindeki ⚡ düğmesi | En çok RAM/CPU kullanan uygulamalar (simgeleriyle) + kapat düğmeleri |
-| Mikrofon / kamera | Bir uygulama kullanırken (her durumda) | Turuncu nokta = mikrofon, yeşil nokta = kamera, kırmızı üstü çizili mikrofon = kullanımda ama kapalı; üzerine gelince uygulama adı |
-| Ses | Ses değişince | Seviye çubuğu + yüzde (1,8 sn) |
-| Mikrofon | Mikrofon kapatılıp açılınca (ada, kısayol, kulaklık düğmesi) | "Mikrofon kapalı / açık" + kısayol (1,8 sn) |
-| Ses çıkışı | Varsayılan çıkış değişince (ör. kulaklık bağlanınca) | Kulaklık / hoparlör simgesi + cihaz adı (2,5 sn) |
-| Güç | Şarj takılıp çıkınca / pil %20 ve %10 | Pil simgesi + durum (1,8 sn) |
-| Süre doldu | Zamanlayıcı bitince | Zil + "Süre doldu", Windows alarm sesi; "Tamam"a basılana kadar kalır |
+| Idle | Nothing is happening | A thin handle hanging from the top edge |
+| Now playing | Spotify, a browser etc. is playing | Album cover (with the playing app's icon in its corner) + title + bars moving with the sound being played (in the cover's colour) |
+| Timer | A timer / stopwatch is running | Orange stopwatch icon + time left / elapsed. In place of the bars if music is playing too |
+| Open player | On hover (with media) | Cover, title, artist, progress (click and drag to seek), ⟲10 ⏮ ⏯ ⏭ 10⟳, quick buttons + system stats |
+| Home | On hover (no media) | Clock, date, battery, quick buttons + system stats |
+| Optimize | The ⚡ button in the system stats | The apps using the most RAM/CPU (with their icons) + close buttons |
+| Microphone / camera | An app is using one (in every state) | Orange dot = microphone, green dot = camera, red struck-through microphone = in use but muted; hover for the app's name |
+| Volume | The volume changes | Level bar + percentage (1.8 s) |
+| Microphone | The microphone is muted / unmuted (island, shortcut, headset button) | "Microphone off / on" + shortcut (1.8 s) |
+| Sound output | The default output changes (e.g. headphones plugged in) | Headphones / speaker icon + device name (2.5 s) |
+| Power | Charger plugged in / out, battery at 20% and 10% | Battery icon + status (1.8 s) |
+| Time's up | A timer ends | Bell + "Time's up", Windows alarm sound; stays until "OK" is pressed |
 
 <p align="center">
-  <img src="docs/images/home.png" width="560" alt="Ana ekran: saat, tarih, hızlı düğmeler, kısayollar, çalışan zamanlayıcı ve sistem bilgileri">
+  <img src="docs/images/en/home.png" width="560" alt="Home: clock, date, quick buttons, shortcuts, a running timer and system stats">
 </p>
 <p align="center">
-  <img src="docs/images/notices.png" alt="Bildirimler: ses seviyesi, mikrofon kapalı ve ses çıkışı">
+  <img src="docs/images/en/notices.png" alt="Notices: volume level, microphone off and sound output">
 </p>
 
-- Adanın üzerinde **fare tekerleği** sesi açar veya kısar.
-- Tepsi simgesine **sol tık** ayarları açar. Ada'ya veya tepsi simgesine **sağ tık**, ayarlar penceresiyle aynı tarzda koyu bir menü açar: Ayarlar, Windows ile başlat (anahtar), Çıkış.
-- Tam ekran bir uygulama (oyun, video) açılınca ada **kendiliğinden gizlenir** (Ayarlar → Davranış → Tam ekranda gizle). Bu kapatılırsa ada oyunun üstünde kalır; ama oyun "tam ekran" (exclusive) modundaysa Windows üstüne hiçbir pencere çizmez, oyunun "kenarlıksız" moda alınması gerekir.
-- Büyütülmüş bir pencere (ör. tarayıcı sekmeleri) adanın altına uzandığında kompakt oynatıcı varsayılan olarak görünür kalır. İstenirse (Ayarlar → Görünüm → İnce çizgi) **yer açar**: ince tutamağa döner, çalan bir şey varsa tutamakta kapak renginde (zamanlayıcıda turuncu) ince bir çizgi kalır. Üzerine gelince yine açılır.
-- **Ctrl + sürükle** adayı taşır: üst kenar boyunca ya da başka bir ekrana. Ortaya yaklaşınca yerine oturur. Konum, ekran ve genişliğin oranı olarak saklanır; çözünürlük veya ölçek değişse de yerinde kalır. Ekran çıkarılırsa ana ekrana döner.
+- The **mouse wheel** over the island turns the volume up or down.
+- **Left-click** on the tray icon opens the settings. **Right-click** on the island or the tray icon opens a dark menu in the same style as the settings window: Settings, Start with Windows (switch), Exit.
+- When a full-screen app (a game, a video) opens, the island **hides by itself** (Settings → Behaviour → Hide in full screen). With this off, the island stays over the game; but if the game is in exclusive "full screen" mode, Windows draws no window over it, and the game has to be set to "borderless".
+- When a maximised window (e.g. browser tabs) reaches under the island, the compact player stays visible by default. Optionally (Settings → Appearance → Thin line) it **makes room**: it shrinks to the thin handle, and if something is playing, a thin line in the cover's colour (orange for a timer) stays on the handle. Hovering opens it as usual.
+- **Ctrl + drag** moves the island: along the top edge or to another screen. It snaps into place near the centre. The position is stored as a fraction of the screen's width, so it stays put when the resolution or scale changes. If the screen is removed, it goes back to the main screen.
 
-### Hızlı düğmeler
+### Quick buttons
 
-Açık adada (ana ekran ve oynatıcı) üç yuvarlak düğme:
+Three round buttons in the open island (home and player):
 
-- **Zamanlayıcı:** 1, 3, 5, 10, 15, 25, 45, 60 dakika ya da kronometre. Çalışırken açık adada bir şerit çıkar: süre, duraklat / devam, +1 dk, durdur. Ada kapalıyken kompakt görünümde süre görünür.
-- **Ses:** Çıkış ve Giriş sekmeleri etkin çıkış cihazlarını ve mikrofonları listeler (seçili olanda ✓). Seçilen cihaz medya, oyun ve görüşmeler için varsayılan olur (Windows Ses ayarlarının yaptığı gibi); mikrofon kısayolu da seçilen mikrofonu kapatır.
-- **İleri / geri sarma:** Sarılabilen oynatıcılarda (çoğu tarayıcı ve uygulama; Windows'a "konum değiştirilebilir" diyenler) açık oynatıcıda ⟲ ⟳ düğmeleri çıkar, 10 sn (5 / 15 / 30 sn seçilebilir) atlar; art arda tıklamalar toplanır. Düğmeler varken açık ada biraz genişler.
-- **Mikrofon:** Varsayılan kayıt cihazını kapatır / açar (Windows'un kendi mikrofon sessize alması; tüm uygulamalar sessizlik alır). Kapalıyken düğme kırmızıdır. Aynı işi her yerden **Ctrl+Alt+K** yapar (ayarlardan değiştirilir veya kaldırılır).
+- **Timer:** 1, 3, 5, 10, 15, 25, 45 or 60 minutes, or a stopwatch. While it runs, a strip appears in the open island: time, pause / resume, +1 min, stop. With the island closed, the time shows in the compact view.
+- **Sound:** the Output and Input tabs list the active output devices and microphones (✓ on the selected one). The chosen device becomes the default for media, games and calls (as Windows Sound settings does); the microphone shortcut mutes the chosen microphone too.
+- **Skip back / ahead:** for players that can seek (most browsers and apps; those that tell Windows their position can be changed), ⟲ ⟳ buttons appear in the open player and skip 10 s (5 / 15 / 30 s can be chosen); repeated clicks add up. With them, the open island gets a little wider.
+- **Microphone:** mutes / unmutes the default recording device (Windows' own microphone mute; every app gets silence). The button is red while muted. **Ctrl+Alt+K** does the same from anywhere (changed or removed in the settings).
 
-### Kısayollar
+### Shortcuts
 
-Sık kullanılan uygulamalar, dosyalar, klasörler ve web siteleri açık adada (ana ekran ve oynatıcı) simge olarak durur, tek tıkla açılır; en fazla 8 tane. Ayarlar → Kısayollar'dan eklenir, sıralanır, kaldırılır (adadaki **+** de oraya götürür). Uygulama seçici Başlat menüsündeki "Tüm uygulamalar" listesini gösterir (masaüstü ve Store uygulamaları). Açılan her şey `explorer.exe` üzerinden başlatılır; ada yönetici olarak çalışsa da uygulamalar normal kullanıcı olarak açılır.
+Frequently used apps, files, folders and websites sit as icons in the open island (home and player) and open with one click; up to 8 of them. They are added, ordered and removed in Settings → Shortcuts (the **+** on the island leads there too). The app picker shows the Start menu's "All apps" list (desktop and Store apps). Everything is launched through `explorer.exe`, so apps open as the normal user even though the island runs as administrator.
 
 ### GIF
 
-Ayarlar → Görünüm'den bir GIF seçilir; açık oynatıcının sol altında, kontrollerin yanında oynar. Dosyanın bir kopyası `%LOCALAPPDATA%\ZeiLand\gif` altında tutulur. Kareler bir kez, arka planda ve gösterileceği boyutta hazırlanır (GIF karelerinin konumları, bekleme süreleri ve "dispose" kuralları uygulanır); uzun GIF'lerde en çok 150 kare tutulur. Yalnızca oynatıcı ekrandayken oynar.
+Choose a GIF in Settings → Appearance; it plays at the bottom left of the open player, next to the controls. A copy of the file is kept under `%LOCALAPPDATA%\ZeiLand\gif`. The frames are prepared once, in the background and at the size they are shown (GIF frame positions, delays and "dispose" rules are applied); long GIFs keep at most 150 frames. It only plays while the player is on screen.
 
 ### Always on display (AOD)
 
-Ayarlar → AOD'den açılır (sağ tık menüsünde de anahtarı var). Siyah, kısık parlaklıkta tam ekranda büyük saat, tarih, çalan şarkı (oynat/duraklat ile), çalışan zamanlayıcı, pil ve mikrofon/kamera ışıkları; hangilerinin görüneceği seçilir.
+Turned on in Settings → AOD (the right-click menu has a switch too). A large clock on a black, dimmed full screen, with the date, the song playing (with play/pause), a running timer, the battery and the microphone/camera lights; you choose which of them show.
 
 <p align="center">
-  <img src="docs/images/aod.png" width="640" alt="Always on display: büyük saat, tarih, çalan şarkı ve çalışan zamanlayıcı">
+  <img src="docs/images/en/aod.png" width="640" alt="Always on display: large clock, date, the song playing and a running timer">
 </p>
 
-- **Ne zaman:** "Boşta kalınca" (1, 2, 5 ya da 10 dakika fare/klavye kullanılmayınca; fare oynayınca ya da bir tuşa basılınca kapanır) ya da "Hep açık" (ör. ikinci ekranda; çift tıklayınca kapanır).
-- **Ekran:** adanın ekranı, belirli bir ekran ya da hepsi (birden çok ekran varsa).
-- "Boşta kalınca", bırakılmış tam ekran bir oyunun üstüne de açılır; oyun kumandası (Xbox uyumlu) da girdi sayılır, kumandayla oynarken araya girmez. Tam ekran izlenen bir videonun (tarayıcı, Filmler ve TV, VLC, MPC, PotPlayer…) üstüne açılmaz. Ekranı tek başına tutan (exclusive) tam ekran bir oyunun üstüne açılmaz; onun üstünde hiçbir pencere görünmez, oyunu tam ekrandan da düşürebilir. "Hep açık", tam ekran uygulamanın olduğu ekranı atlar; oyun bir ekrandayken diğer ekranda açık kalır. Odağı hiçbir zaman almaz.
-- Görünürken ekran kapanmaz (`SetThreadExecutionState`). İz kalmasın diye içerik dakikada bir birkaç piksel kayar.
-- Hafif: dakikada bir (zamanlayıcı çalışırken saniyede bir) yeniden çizilir. Boşluk beklenirken, birkaç dakikada bir tek bir zamanlayıcı çalışır (kumanda takılıysa ona iki saniyede bir bakılır); girdi yalnızca AOD görünürken sık izlenir.
-- "Önizle" düğmesi AOD'yi hemen gösterir.
+- **When:** "When idle" (after 1, 2, 5 or 10 minutes without mouse/keyboard input; it closes when the mouse moves or a key is pressed) or "Always" (e.g. on a second screen; double-click to close).
+- **Screen:** the island's screen, a specific screen or all of them (with several screens).
+- "When idle" also opens over a full-screen game left alone; a game controller (Xbox compatible) counts as input as well, so it doesn't get in the way while you play with one. It doesn't open over a video being watched in full screen (browser, Films & TV, VLC, MPC, PotPlayer…). It doesn't open over a game that holds the screen exclusively; no window shows over such a game, and trying could knock it out of full screen. "Always" skips the screen with the full-screen app; with a game on one screen, it stays on the other. It never takes the focus.
+- The screen doesn't turn off while it shows (`SetThreadExecutionState`). The content shifts a few pixels every minute so nothing burns in.
+- Light: it redraws once a minute (once a second while a timer runs). While it waits for idle, a single timer runs every few minutes (a connected controller is checked every two seconds); input is watched closely only while the AOD shows.
+- The "Preview" button shows the AOD right away.
 
-### Güncellemeler
+### Updates
 
-ZeiLand, [GitHub sürümlerini](https://github.com/zeigarn/ZeiLand/releases) açılıştan kısa süre sonra ve altı saatte bir kontrol eder (tek küçük istek). Yeni sürüm varsa kurulum dosyasını indirir, GitHub'ın verdiği SHA-256 ile doğrular ve uygun bir anda (ada kapalı, zamanlayıcı yok, tam ekran oyun/video yok) sessizce kurar; ada "yükleniyor" der, birkaç saniye içinde yeni sürümle açılır ve "güncellendi" der. Ayarlar → Hakkında'dan kapatılabilir ya da elle denetlenebilir. Bunun dışında hiçbir yere bir şey gönderilmez.
+ZeiLand checks the [GitHub releases](https://github.com/zeigarn/ZeiLand/releases) shortly after it starts and every six hours (one small request). If there is a new version, it downloads the setup, checks it against the SHA-256 GitHub provides and installs it silently at a good moment (island closed, no timer, no full-screen game/video); the island says "installing", comes back with the new version within a few seconds and says "updated". This can be turned off, or checked by hand, in Settings → About. Nothing is sent anywhere else.
 
-### Ayarlar
+### Settings
 
-Ayarlar penceresindeki her değişiklik anında uygulanır ve `%LOCALAPPDATA%\ZeiLand\settings.json` dosyasına kaydedilir.
+Every change in the settings window applies at once and is saved to `%LOCALAPPDATA%\ZeiLand\settings.json`.
 
-- **Dil:** Türkçe ya da İngilizce (Davranış sekmesinde; varsayılan Windows'un dili). Açık pencereler anında değişir.
-- **Ada / Adada göster:** çalan medya (ve oynayan çubuklar), ses göstergesi, şarj bildirimleri, mikrofon/kamera ışıkları, saat/tarih, sistem bilgileri; sistem bilgilerinde CPU, CPU °C, GPU, GPU °C, RAM tek tek seçilir. Kapatılan bilgi hiç ölçülmez. **Kaynaklar:** medya çalan uygulamalar listelenir; işareti kaldırılanın medyası adada gösterilmez (o çalarken başka bir oynatıcınınki, önce çalanı, gösterilir).
-- **Ada / CPU sıcaklığı:** durumunu gösterir; gerekiyorsa sürücüyü kurar veya uygulamayı yönetici olarak yeniden başlatır.
-- **Görünüm:** kapalıyken görünüm (mini oynatıcı / ince çizgi, resimli önizlemeyle), konum ("Ortaya al"), oynatıcıdaki GIF, ileri / geri sarma süresi (kapalı / 5 / 10 / 15 / 30 sn) ve hangi hızlı düğmelerin (zamanlayıcı / kronometre, ses giriş / çıkış, mikrofon) görüneceği.
-- **AOD:** yukarıdaki gibi.
-- **Kısayollar:** yukarıdaki gibi.
-- **Davranış:** açılma gecikmesi (anında / normal / yavaş), tekerlekle ses ve bir tıkın adımı (%1 / %2 / %5), mikrofon kısayolu (düğmeye basıp yeni tuşlara basılır; Esc vazgeçer, Geri tuşu kaldırır; başka bir uygulama kullanıyorsa uyarır), zamanlayıcı sesi, tam ekranda gizle (kapalıyken ada oyunun üstünde kalır; ama oyun "tam ekran" (exclusive) modundaysa üstünde hiçbir pencere görünmez, oyun "kenarlıksız" moda alınmalı, ör. LoL'de Ayarlar → Video → Pencere modu), Windows ile başlat.
-- **Hakkında:** sürüm, otomatik güncelleme, hoş geldin rehberi, lisans, ayarları sıfırla (kısayollar ve GIF kalır).
+- **Language:** Turkish or English (in the Behaviour tab; Windows' language by default). Open windows switch at once.
+- **Island / Show on the island:** now playing (and the moving bars), the volume indicator, charging notices, the microphone/camera lights, clock/date, system stats; in the system stats, CPU, CPU °C, GPU, GPU °C and RAM are chosen one by one. Anything turned off isn't measured at all. **Sources:** the apps playing media are listed; an unticked app's media isn't shown on the island (while it plays, another player's is shown, the one that started first).
+- **Island / CPU temperature:** shows its status; installs the driver or restarts the app as administrator if needed.
+- **Appearance:** the closed look (mini player / thin line, with a picture preview), the position ("Centre"), the GIF in the player, the skip length (off / 5 / 10 / 15 / 30 s) and which quick buttons (timer / stopwatch, sound in / out, microphone) show.
+- **AOD:** as above.
+- **Shortcuts:** as above.
+- **Behaviour:** open delay (instant / normal / slow), wheel for volume and the size of one notch (1% / 2% / 5%), microphone shortcut (press the button, then the new keys; Esc cancels, Backspace removes it; warns if another app uses it), timer sound, hide in full screen (with it off, the island stays over the game; but if the game is in exclusive "full screen" mode, no window shows over it, so set the game to "borderless", e.g. in LoL: Settings → Video → Window mode), Start with Windows.
+- **About:** version, automatic updates, the welcome guide, the license, reset settings (shortcuts and the GIF stay).
 
-### Mikrofon ve kamera ışıkları
+### Microphone and camera lights
 
-Apple cihazlardaki gibi: bir uygulama mikrofonu kullanırken **turuncu**, kamerayı kullanırken **yeşil** nokta yanar. Ada kapalıyken de görünür (dinlenme tutamağı biraz uzar), kompakt oynatıcıda çubukların yanında, açık durumlarda üst kenarda durur. Noktanın üzerine gelince hangi uygulama olduğu yazar. Mikrofon kapalıyken (ör. görüşmede sessizdeyken) turuncu nokta yerine kırmızı, üstü çizili küçük bir mikrofon görünür.
+As on Apple devices: an **orange** dot lights up while an app uses the microphone, a **green** one while an app uses the camera. They show with the island closed too (the resting handle gets a little longer), next to the bars in the compact player and along the top edge in the open states. Hovering a dot shows which app it is. While the microphone is muted (e.g. muted in a call), a small red struck-through microphone shows instead of the orange dot.
 
-Kaynaklar doğrudan donanımı kullananlardır, hiçbir şey sürekli kontrol edilmez:
+The sources are the ones using the hardware directly; nothing is checked continuously:
 
-- **Mikrofon:** Core Audio'da etkin bir kayıt oturumu olan süreçler (ses karıştırıcısının gördüğü). Bir oturum açılınca, başlayıp durunca ya da bir kayıt cihazı takılıp çıkınca Windows haber verir (`IAudioSessionNotification`, `IAudioSessionEvents`); ancak o zaman oturumlar yeniden listelenir.
-- **Kamera:** Kameradan görüntü alan süreçler, Windows'un kamera çerçeve sunucusunun bildirdiği şekliyle (Media Foundation `IMFSensorActivityMonitor`). Değişince rapor gelir.
+- **Microphone:** processes with an active capture session in Core Audio (what the volume mixer sees). Windows reports when a session opens, starts or stops, or when a recording device is plugged in or out (`IAudioSessionNotification`, `IAudioSessionEvents`); only then are the sessions listed again.
+- **Camera:** processes taking frames from a camera, as Windows' camera frame server reports them (Media Foundation `IMFSensorActivityMonitor`). A report comes when it changes.
 
-0.5.0'a kadar Windows'un gizlilik göstergesi kaydı (`CapabilityAccessManager\ConsentStore`) okunuyordu; yeni Windows sürümleri bu kaydı güncellemeyi bıraktığı için Discord gibi uygulamalar görünmüyordu.
+Up to 0.5.0, Windows' privacy indicator registry (`CapabilityAccessManager\ConsentStore`) was read; newer Windows versions stopped updating it, so apps like Discord didn't show.
 
 ### Optimize
 
-Sistem bilgilerinin yanındaki ⚡ düğmesi, oturumunda en çok bellek ve işlemci kullanan uygulamaları simgeleriyle listeler. Bir uygulamanın penceresiz yardımcı süreçleri, onu başlatan uygulamanın satırında toplanır (ör. `Brave ×16`, Steam'in tarayıcı süreçleri `Steam` altında); fareyle satırın üzerine gelince dosya yolu görünür. Liste yalnızca panel açıkken, iki saniyede bir yenilenir; fare listenin üzerindeyken satırlar yer değiştirmez.
+The ⚡ button next to the system stats lists the apps in your session using the most memory and processor, with their icons. An app's windowless helper processes are grouped on the row of the app that started them (e.g. `Brave ×16`, Steam's browser processes under `Steam`); hovering a row shows the file path. The list refreshes only while the panel is open, every two seconds; rows don't move while the mouse is over the list.
 
-- **Kapat:** Uygulamadan penceresini kapatmasını ister; kaydedilmemiş iş varsa uygulama sorar.
-- **Sonlandır:** Penceresi olmayan ya da kapanmayı reddeden (ör. tepsiye küçülen) uygulamalar için. İkinci tıkla onaylanır.
-- Kapanan uygulama için ne kadar bellek boşaldığı yazılır.
-- Windows'un çalışması için gereken süreçler (`explorer`, `dwm`, `svchost`, `csrss` vb.), servisler ve diğer kullanıcıların süreçleri hiç listelenmez.
+- **Close:** asks the app to close its window; if there is unsaved work, the app asks.
+- **End task:** for apps with no window or that refuse to close (e.g. ones that minimise to the tray). Confirmed with a second click.
+- How much memory was freed is shown for a closed app.
+- Processes Windows needs to run (`explorer`, `dwm`, `svchost`, `csrss` etc.), services and other users' processes are never listed.
 
-"RAM temizleyici" türü araçlar gibi çalışan uygulamaların belleğini zorla diske itmez; bu Windows'u yavaşlatır. Gerçek kazanç, kullanılmayan uygulamayı kapatmaktır.
+It doesn't force running apps' memory out to disk like "RAM cleaner" tools do; that slows Windows down. The real gain is closing the app you aren't using.
 
-### Sistem bilgileri
+### System stats
 
-Ada açıkken alt satırda saniyede bir güncellenir. CPU sıcaklığı dışındakiler yönetici izni istemez.
+Updated once a second in the bottom row while the island is open. Apart from the CPU temperature, none of them needs administrator rights.
 
-| Değer | Kaynak |
+| Value | Source |
 |---|---|
-| CPU kullanımı | `GetSystemTimes` |
-| RAM kullanımı / kullanılan GB | `GlobalMemoryStatusEx` |
-| GPU kullanımı | PDH `GPU Engine` sayaçları (Görev Yöneticisi gibi: en meşgul motor) |
-| GPU sıcaklığı | D3DKMT `ADAPTERPERFDATA` (Görev Yöneticisi'nin kaynağı) |
-| CPU sıcaklığı | [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) + [PawnIO](https://github.com/namazso/PawnIO) sürücüsü (Ryzen: Tctl/Tdie, Intel: Package) |
+| CPU usage | `GetSystemTimes` |
+| RAM usage / GB used | `GlobalMemoryStatusEx` |
+| GPU usage | PDH `GPU Engine` counters (like Task Manager: the busiest engine) |
+| GPU temperature | D3DKMT `ADAPTERPERFDATA` (Task Manager's source) |
+| CPU temperature | [LibreHardwareMonitor](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) + the [PawnIO](https://github.com/namazso/PawnIO) driver (Ryzen: Tctl/Tdie, Intel: Package) |
 
-En çok VRAM'e sahip adaptör (ekran kartı) seçilir; işlemcinin dahili GPU'su atlanır. Sıcaklıklar 80 °C'de turuncu, 90 °C'de kırmızı olur.
+The adapter (graphics card) with the most VRAM is chosen; the processor's integrated GPU is skipped. Temperatures turn orange at 80 °C and red at 90 °C.
 
-**CPU sıcaklığı** için Windows'ta sürücüsüz bir yol yoktur (HWiNFO ve LibreHardwareMonitor da sürücü kullanır). Gerekenler:
+There is no driverless way to read the **CPU temperature** on Windows (HWiNFO and LibreHardwareMonitor use a driver too). It needs:
 
-1. **PawnIO sürücüsü**, bir kez kurulur. Ayarlar → CPU sıcaklığı → "PawnIO'yu kur" (`winget install namazso.PawnIO`) ya da [PawnIO.Setup sürümleri](https://github.com/namazso/PawnIO.Setup/releases).
-2. **Yönetici modu.** "Windows ile başlat" açıksa ada her oturumda Görev Zamanlayıcı üzerinden UAC sormadan yönetici olarak başlar. Elle açılırsa bir kez UAC sorar; reddedilirse sıcaklık olmadan çalışır.
+1. **The PawnIO driver**, installed once. Settings → CPU temperature → "Install PawnIO" (`winget install namazso.PawnIO`) or the [PawnIO.Setup releases](https://github.com/namazso/PawnIO.Setup/releases).
+2. **Administrator mode.** With "Start with Windows" on, the island starts as administrator through Task Scheduler at every sign-in, without a UAC prompt. Opened by hand, it asks UAC once; if refused, it runs without the temperature.
 
-Sensör yalnızca CPU sıcaklığı gösterilirken ve ada ilk açıldığında başlatılır.
+The sensor starts only while the CPU temperature is shown and the island is first opened.
 
-## Performans tasarımı
+## Performance design
 
-- **Boşta CPU ≈ 0:** Polling yok. Medya (GSMTC), ses (Core Audio), güç ve tam ekran bilgileri Windows'tan olay olarak gelir.
-- **Animasyon yalnızca hareket varken çalışır:** Yay (spring) fiziği `CompositionTarget.Rendering`'e sadece animasyon süresince bağlanır.
-- **Şekil değişimi düzen hesabı yapmaz:** Ada, tek bir `RectangleGeometry` kırpma alanının yay ile animasyonudur.
-- **Yazılımsal çizim:** Direct3D/GPU sürücüsü sürece yüklenmez. Ölçülen: private bellek 86 MB → ~20 MB, animasyon CPU'su aynı.
-- **Ek bağımlılık yok:** NAudio, WinForms vb. kullanılmaz. Tepsi, ses ve güç doğrudan Win32/COM ile.
-- **Çubuklar gerçek sese göre, yalnızca görünürken oynar:** Kompakt medya görünümü ekrandayken ve müzik çalarken, saniyede ~30 kez Core Audio'nun tepe seviye ölçeri (`IAudioMeterInformation`, ses karıştırıcısındaki çubuğun kaynağı) okunur. Ses verisi alınmaz, FFT yapılmaz. Otomatik kazanç sessiz ve gürültülü şarkıları eşit canlı gösterir; sessizlikte çubuklar durur ve yeniden çizim olmaz. Duraklatınca, ada açılınca veya tam ekranda okuma da durur.
-- **Çubuklar yalnızca çalan uygulamayı dinler:** Ölçer, medyayı çalan uygulamanın kendi ses oturumlarından okunur (ses karıştırıcısındaki uygulama çubuğu); Discord'daki konuşma veya bir oyunun sesi çubukları oynatmaz. Uygulamanın ayrı bir ses oturumu yoksa tüm çıkışa geri dönülür.
-- **Üstteki pencere olayla izlenir:** Ön plandaki pencere değişince ve yalnızca o uygulamanın pencereleri taşınınca/boyutlanınca Windows haber verir (`SetWinEventHook`); pencerenin gerçek sınırı DWM'den okunur. Zamanlayıcı yok.
-- **Kısayol klavye kancası değildir:** `RegisterHotKey`; Windows yalnızca o tuş birleşimine basılınca mesaj gönderir.
-- **Zamanlayıcı saymaz:** Geri sayımın bitişi tek bir zamanlayıcıyla beklenir; süre, yalnızca ekrandayken ve rakam değiştiği anda (saniyede bir) yeniden çizilir.
-- **Sistem bilgileri yalnızca ada açıkken okunur:** Arka planda hiçbir ölçüm çalışmaz.
-- **Heap üst sınırı (64 MB):** .NET gen0 bütçesini L3 önbelleğe göre ayarlar; 96 MB L3'lü işlemcide toplamalar arasında ~65 MB çöp birikiyordu. Sınır bütçeyi ~5 MB'a indirir (test: tepe bellek 117 MB → 36 MB).
+- **Idle CPU ≈ 0:** no polling. Media (GSMTC), sound (Core Audio), power and full-screen information come from Windows as events.
+- **Animation runs only while something moves:** the spring physics hooks into `CompositionTarget.Rendering` only for the length of an animation.
+- **Changing shape does no layout pass:** the island is a spring animation of a single `RectangleGeometry` clip.
+- **Software rendering:** no Direct3D/GPU driver is loaded into the process. Measured: private memory 86 MB → ~20 MB, animation CPU the same.
+- **No extra dependencies:** no NAudio, WinForms etc. Tray, sound and power go straight through Win32/COM.
+- **The bars follow the real sound, only while visible:** while the compact media view is on screen and music is playing, Core Audio's peak meter (`IAudioMeterInformation`, the source of the volume mixer's bar) is read ~30 times a second. No audio data is taken and no FFT is done. Automatic gain makes quiet and loud songs look equally lively; in silence the bars stop and nothing is redrawn. Reading stops when paused, when the island opens or in full screen.
+- **The bars listen only to the playing app:** the meter is read from the playing app's own audio sessions (the app's bar in the volume mixer); a Discord call or a game's sound doesn't move the bars. If the app has no separate audio session, it falls back to the whole output.
+- **The top window is followed through events:** Windows reports when the foreground window changes, and only when that app's windows move or resize (`SetWinEventHook`); the window's real bounds come from DWM. No timer.
+- **The shortcut isn't a keyboard hook:** `RegisterHotKey`; Windows sends a message only when that key combination is pressed.
+- **The timer doesn't count:** the end of a countdown is awaited with a single timer; the time is redrawn only while on screen and only when a digit changes (once a second).
+- **System stats are read only while the island is open:** no measurement runs in the background.
+- **Heap limit (64 MB):** .NET sizes the gen0 budget by the L3 cache; on a processor with 96 MB of L3, ~65 MB of garbage piled up between collections. The limit brings the budget down to ~5 MB (test: peak memory 117 MB → 36 MB).
 
-Ölçüm (Release, ReadyToRun, Ryzen 7 9800X3D, 2560×1440):
+Measured (Release, ReadyToRun, Ryzen 7 9800X3D, 2560×1440):
 
 | | |
 |---|---|
-| Boşta CPU (10 sn) | 0 ms |
-| Kurulu sürüm, yayın açıkken, tutamak kipinde (10 sn) | makinenin %0,06'sı |
-| Müzik çalarken (çubuklar oynarken) | ~3 ms/sn (tek çekirdeğin ~%0,3'ü) |
-| Ada açıkken sistem bilgisi okuma | ~5 ms/örnek, saniyede bir |
-| Optimize paneli açıkken süreç taraması | ~5–7 ms/örnek, iki saniyede bir |
-| Bir ses göstergesi aç/kapa | ~170 ms CPU toplam |
-| Private bellek (kullanım altında) | ~26–33 MB |
-| Working set | ~100 MB (çoğu paylaşılan sistem DLL'leri; WPF açılışta GPU sürücüsünü de yükler) |
+| Idle CPU (10 s) | 0 ms |
+| Installed version, while streaming, in handle mode (10 s) | 0.06% of the machine |
+| With music playing (bars moving) | ~3 ms/s (~0.3% of one core) |
+| Reading system stats while the island is open | ~5 ms/sample, once a second |
+| Process scan while the Optimize panel is open | ~5–7 ms/sample, every two seconds |
+| Showing/hiding a volume indicator | ~170 ms CPU in total |
+| Private memory (in use) | ~26–33 MB |
+| Working set | ~100 MB (mostly shared system DLLs; WPF also loads the GPU driver at startup) |
 
-## Derleme
+## Building
 
-Gereken: .NET 10 SDK.
+Needs: .NET 10 SDK.
 
 ```bash
 dotnet build ZeiLand/ZeiLand.csproj -c Release
 ```
 
-Çalıştırılabilir klasör (.NET 10 Desktop Runtime kurulu makineler için):
+A runnable folder (for machines with the .NET 10 Desktop Runtime installed):
 
 ```bash
 dotnet publish ZeiLand/ZeiLand.csproj -c Release -r win-x64 --self-contained false -o publish
 ```
 
-Kurulum paketi (`installer/out/ZEIGARN-Setup-<sürüm>.exe`). Gereken: [Inno Setup 6](https://jrsoftware.org/isinfo.php) (`winget install JRSoftware.InnoSetup`). Betik uygulamayı .NET dahil yayımlar, PawnIO'nun resmi kurulumunu indirip SHA-256 ile doğrular ve paketi derler:
+The setup package (`installer/out/ZEIGARN-Setup-<version>.exe`). Needs [Inno Setup 6](https://jrsoftware.org/isinfo.php) (`winget install JRSoftware.InnoSetup`). The script publishes the app with .NET included, downloads PawnIO's official setup, checks it with SHA-256 and builds the package:
 
 ```bash
 powershell -ExecutionPolicy Bypass -File installer/build.ps1
 ```
 
-Uygulama simgesi `ZeiLand/tools/make-icon.ps1` ile üretilir.
+The app icon is made with `ZeiLand/tools/make-icon.ps1`.
 
-### Sürüm yayınlama
+### Publishing a release
 
-Kurulu kopyaların kendini güncellemesi için: `ZeiLand/ZeiLand.csproj` içindeki `<Version>` artırılır, commit'lenip push'lanır, sonra paket derlenip GitHub'da bir sürüm (`v<sürüm>`, ek dosya `ZEIGARN-Setup-<sürüm>.exe`) açılır. Gereken: [GitHub CLI](https://cli.github.com) (`winget install GitHub.cli`, `gh auth login`). Depo herkese açık olmalıdır; kurulu uygulamalar sürümleri oturum açmadan okur. Sürüm notlarının başına SmartScreen uyarısının nasıl geçileceği (Türkçe ve İngilizce) eklenir.
+For installed copies to update themselves: raise `<Version>` in `ZeiLand/ZeiLand.csproj`, commit and push, then build the package and open a GitHub release (`v<version>`, attached file `ZEIGARN-Setup-<version>.exe`). Needs the [GitHub CLI](https://cli.github.com) (`winget install GitHub.cli`, `gh auth login`). The repository must be public; installed apps read the releases without signing in. The release notes start with how to get past the SmartScreen warning (in Turkish and English).
 
 ```bash
 powershell -ExecutionPolicy Bypass -File installer/release.ps1
 ```
 
-## Proje yapısı
+## Project structure
 
 ```
 ZeiLand/
-  App.xaml.cs              başlangıç, servislerin bağlanması, tek örnek / yönetici olarak yeniden başlatma
-  IslandWindow.xaml(.cs)   ada penceresi, durumlar, animasyon, paneller (optimize, ses giriş / çıkış, zamanlayıcı)
-  IslandWindow.Media.cs    ilerleme çubuğunda sarma, ileri / geri düğmeleri, çalan uygulamanın simgesi
-  IslandWindow.Placement.cs konum, Ctrl + sürükle ile taşıma, birden çok ekran
-  AlwaysOnDisplay.cs       AOD'nin ne zaman / hangi ekranda açılacağı
-  AodWindow.xaml(.cs)      AOD ekranı
-  Loc.cs                   Türkçe / İngilizce metinler ({DynamicResource} ile canlı dil değişimi)
-  SettingsWindow.xaml(.cs) ayarlar penceresi (kısayol kaydedici dahil)
-  SettingsWindow.Pages.cs  sekmeler, Görünüm, Kısayollar ve Hakkında sayfaları
-  WelcomeWindow.xaml(.cs)  ilk açılıştaki hoş geldin rehberi
-  TrayMenu.xaml(.cs)       tepsi / sağ tık menüsü
-  Settings/                AppSettings (bağlanabilir ayarlar), ShortcutItem, SettingsStore (JSON kaydı)
-  Animation/               SpringAnimator (yay fiziği), LevelMeter (sese göre çubuklar)
-  Controls/BatteryGlyph    OnRender ile çizilen pil simgesi
-  Controls/StatsPanel      CPU / GPU / RAM satırı + optimize düğmesi
-  Controls/QuickActions    zamanlayıcı / ses / mikrofon düğmeleri (ayarlardan seçilir)
-  Controls/TimerStrip      çalışan zamanlayıcı şeridi
-  Controls/ShortcutBar     kullanıcının kısayol simgeleri
-  Controls/GifImage        yalnızca ekrandayken oynayan, önceden hazırlanmış GIF
+  App.xaml.cs              startup, wiring the services, single instance / restart as administrator
+  IslandWindow.xaml(.cs)   the island window, states, animation, panels (optimize, sound in / out, timer)
+  IslandWindow.Media.cs    seeking on the progress bar, skip buttons, the playing app's icon
+  IslandWindow.Placement.cs position, moving with Ctrl + drag, multiple screens
+  AlwaysOnDisplay.cs       when / on which screen the AOD opens
+  AodWindow.xaml(.cs)      the AOD screen
+  Loc.cs                   Turkish / English texts (live language switch through {DynamicResource})
+  SettingsWindow.xaml(.cs) the settings window (shortcut recorder included)
+  SettingsWindow.Pages.cs  tabs, the Appearance, Shortcuts and About pages
+  WelcomeWindow.xaml(.cs)  the welcome guide on first launch
+  TrayMenu.xaml(.cs)       tray / right-click menu
+  Settings/                AppSettings (bindable settings), ShortcutItem, SettingsStore (JSON storage)
+  Animation/               SpringAnimator (spring physics), LevelMeter (bars following the sound)
+  Controls/BatteryGlyph    battery icon drawn in OnRender
+  Controls/StatsPanel      the CPU / GPU / RAM row + optimize button
+  Controls/QuickActions    timer / sound / microphone buttons (chosen in the settings)
+  Controls/TimerStrip      the running timer strip
+  Controls/ShortcutBar     the user's shortcut icons
+  Controls/GifImage        a GIF prepared in advance that plays only while on screen
   Services/                Media, Volume, Microphone, AudioDevices, Power, SystemStats, CpuTemperatureReader,
                            ProcessMonitor, PrivacyMonitor, TopWindowWatcher, TimerService, Hotkeys, AppIcons,
                            FullscreenWatcher, TrayIcon, Autostart, Elevation, Shortcuts, UpdateService, Displays, Gamepads
-  Native/                  Win32, Core Audio, Media Foundation (kamera etkinliği), D3DKMT ve PDH tanımları
+  Native/                  Win32, Core Audio, Media Foundation (camera activity), D3DKMT and PDH definitions
 installer/
-  ZeiLand.iss              Inno Setup betiği (ZEIGARN kurulumu)
-  build.ps1                yayımla + PawnIO'yu indir/doğrula + paketle
-  release.ps1              paketle + GitHub sürümü aç
-  license-tr.txt, -en.txt  kurulumda kabul edilen koşullar (özet + MIT + gizlilik)
-  THIRD-PARTY-NOTICES.txt  üçüncü taraf lisansları (kurulumla gelir)
-docs/images/               README görselleri (uygulamanın kendi çizimi, örnek içerikle)
+  ZeiLand.iss              Inno Setup script (the ZEIGARN setup)
+  build.ps1                publish + download/check PawnIO + package
+  release.ps1              package + open a GitHub release
+  license-tr.txt, -en.txt  terms accepted during setup (summary + MIT + privacy)
+  THIRD-PARTY-NOTICES.txt  third-party licenses (shipped with the setup)
+docs/images/               README pictures (drawn by the app itself, with sample content; en/ with the English UI)
 ```
 
-## Lisans
+## License
 
 [MIT](LICENSE) © 2026 ZEIGARN.
 
-## Üçüncü taraf
+## Third party
 
-- [LibreHardwareMonitorLib](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) (MPL-2.0): CPU sıcaklığı.
-- [PawnIO](https://github.com/namazso/PawnIO) (GPL-2.0): ZeiLand'in parçası değildir. Kurulum paketi resmi, imzalı `PawnIO_setup.exe`'yi değiştirmeden içerir ve yalnızca kullanıcı seçerse çalıştırır (`-install -silent`).
+- [LibreHardwareMonitorLib](https://github.com/LibreHardwareMonitor/LibreHardwareMonitor) (MPL-2.0): CPU temperature.
+- [PawnIO](https://github.com/namazso/PawnIO) (GPL-2.0): not part of ZeiLand. The setup package includes the official, signed `PawnIO_setup.exe` unchanged and runs it only if the user chooses to (`-install -silent`).
