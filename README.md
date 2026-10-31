@@ -8,7 +8,7 @@ Windows 10/11 için hafif bir "Dynamic Island". Ekranın üst ortasında durur, 
 
 ## Kurulum
 
-`ZEIGARN-Setup-<sürüm>.exe` ([Sürümler](https://github.com/kaandemirr/ZeiLand/releases)) çalıştırılır.
+`ZEIGARN-Setup-<sürüm>.exe` ([Sürümler](https://github.com/zeigarn/ZeiLand/releases)) çalıştırılır.
 
 > **"Windows kişisel bilgisayarınızı korudu" derse:** **Ek bilgi → Yine de çalıştır**. Kurulum dosyası kod imzalı olmadığı için Windows SmartScreen ilk kurulumda bu uyarıyı gösterir; virüs uyarısı değildir. İstenirse önce dosyaya sağ tık → Özellikler → **Engellemeyi kaldır** işaretlenir, uyarı hiç çıkmaz. Güncellemeler bu uyarı olmadan, sessizce kurulur.
 
@@ -89,7 +89,7 @@ Ayarlar → AOD'den açılır (sağ tık menüsünde de anahtarı var). Siyah, k
 
 ### Güncellemeler
 
-ZeiLand, [GitHub sürümlerini](https://github.com/kaandemirr/ZeiLand/releases) açılıştan kısa süre sonra ve altı saatte bir kontrol eder (tek küçük istek). Yeni sürüm varsa kurulum dosyasını indirir, GitHub'ın verdiği SHA-256 ile doğrular ve uygun bir anda (ada kapalı, zamanlayıcı yok, tam ekran oyun/video yok) sessizce kurar; ada "yükleniyor" der, birkaç saniye içinde yeni sürümle açılır ve "güncellendi" der. Ayarlar → Hakkında'dan kapatılabilir ya da elle denetlenebilir. Bunun dışında hiçbir yere bir şey gönderilmez.
+ZeiLand, [GitHub sürümlerini](https://github.com/zeigarn/ZeiLand/releases) açılıştan kısa süre sonra ve altı saatte bir kontrol eder (tek küçük istek). Yeni sürüm varsa kurulum dosyasını indirir, GitHub'ın verdiği SHA-256 ile doğrular ve uygun bir anda (ada kapalı, zamanlayıcı yok, tam ekran oyun/video yok) sessizce kurar; ada "yükleniyor" der, birkaç saniye içinde yeni sürümle açılır ve "güncellendi" der. Ayarlar → Hakkında'dan kapatılabilir ya da elle denetlenebilir. Bunun dışında hiçbir yere bir şey gönderilmez.
 
 ### Ayarlar
 

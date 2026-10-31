@@ -29,7 +29,7 @@ internal enum UpdateState
 /// </summary>
 internal sealed class UpdateService
 {
-    public const string Repository = "kaandemirr/ZeiLand";
+    public const string Repository = "zeigarn/ZeiLand";
     public const string ReleasesPage = $"https://github.com/{Repository}/releases";
 
     private static readonly TimeSpan FirstCheck = TimeSpan.FromSeconds(45);

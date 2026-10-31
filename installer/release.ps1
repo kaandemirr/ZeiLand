@@ -2,7 +2,7 @@
 # Needs what build.ps1 needs, plus the GitHub CLI (winget install GitHub.cli) signed in with access to the repository.
 # Bump <Version> in ZeiLand\ZeiLand.csproj, commit and push first: the release is made from the pushed commit.
 param(
-    [string]$Repository = 'kaandemirr/ZeiLand', # keep in step with UpdateService.Repository
+    [string]$Repository = 'zeigarn/ZeiLand',    # keep in step with UpdateService.Repository
     [string]$Notes = ''                         # empty: GitHub writes notes from the commits since the last release
 )
 $ErrorActionPreference = 'Stop'
