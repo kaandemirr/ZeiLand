@@ -4,7 +4,11 @@ Windows 10/11 için hafif bir "Dynamic Island". Ekranın üst ortasında durur, 
 
 ## Kurulum
 
-`ZEIGARN-Setup-<sürüm>.exe` ([Sürümler](https://github.com/kaandemirr/ZeiLand/releases)) çalıştırılır. Kurulum:
+`ZEIGARN-Setup-<sürüm>.exe` ([Sürümler](https://github.com/kaandemirr/ZeiLand/releases)) çalıştırılır.
+
+> **"Windows kişisel bilgisayarınızı korudu" derse:** **Ek bilgi → Yine de çalıştır**. Kurulum dosyası kod imzalı olmadığı için Windows SmartScreen ilk kurulumda bu uyarıyı gösterir; virüs uyarısı değildir. İstenirse önce dosyaya sağ tık → Özellikler → **Engellemeyi kaldır** işaretlenir, uyarı hiç çıkmaz. Güncellemeler bu uyarı olmadan, sessizce kurulur.
+
+Kurulum:
 
 - Windows Türkçeyse Türkçe, değilse İngilizce açılır. Önce kullanım koşullarını gösterir (özet, MIT lisansı, gizlilik notu); kabul edilince devam eder.
 - ZeiLand'i `Program Files\ZEIGARN\ZeiLand` altına kurar (.NET içinde gelir, ayrıca bir şey gerekmez) ve Başlat menüsüne ekler.
@@ -176,7 +180,7 @@ Uygulama simgesi `ZeiLand/tools/make-icon.ps1` ile üretilir.
 
 ### Sürüm yayınlama
 
-Kurulu kopyaların kendini güncellemesi için: `ZeiLand/ZeiLand.csproj` içindeki `<Version>` artırılır, commit'lenip push'lanır, sonra paket derlenip GitHub'da bir sürüm (`v<sürüm>`, ek dosya `ZEIGARN-Setup-<sürüm>.exe`) açılır. Gereken: [GitHub CLI](https://cli.github.com) (`winget install GitHub.cli`, `gh auth login`). Depo herkese açık olmalıdır; kurulu uygulamalar sürümleri oturum açmadan okur.
+Kurulu kopyaların kendini güncellemesi için: `ZeiLand/ZeiLand.csproj` içindeki `<Version>` artırılır, commit'lenip push'lanır, sonra paket derlenip GitHub'da bir sürüm (`v<sürüm>`, ek dosya `ZEIGARN-Setup-<sürüm>.exe`) açılır. Gereken: [GitHub CLI](https://cli.github.com) (`winget install GitHub.cli`, `gh auth login`). Depo herkese açık olmalıdır; kurulu uygulamalar sürümleri oturum açmadan okur. Sürüm notlarının başına SmartScreen uyarısının nasıl geçileceği (Türkçe ve İngilizce) eklenir.
 
 ```bash
 powershell -ExecutionPolicy Bypass -File installer/release.ps1

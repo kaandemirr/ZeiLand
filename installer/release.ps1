@@ -1,4 +1,4 @@
-# Publishes a release on GitHub with the installer attached; installed copies pick it up and update themselves.
+﻿# Publishes a release on GitHub with the installer attached; installed copies pick it up and update themselves.
 # Needs what build.ps1 needs, plus the GitHub CLI (winget install GitHub.cli) signed in with access to the repository.
 # Bump <Version> in ZeiLand\ZeiLand.csproj, commit and push first: the release is made from the pushed commit.
 param(
@@ -16,7 +16,15 @@ if (-not (git -C $root branch -r --contains $commit)) { throw "Commit $commit is
 $installer = & (Join-Path $PSScriptRoot 'build.ps1') | Select-Object -Last 1
 $version = (Select-Xml -Path (Join-Path $root 'ZeiLand\ZeiLand.csproj') -XPath '//Version').Node.InnerText
 
+# The setup isn't code-signed, so SmartScreen stops its first run: the notes start with how to get past it.
+$installNote = @'
+**Kurulum:** Windows "Windows kişisel bilgisayarınızı korudu" derse **Ek bilgi → Yine de çalıştır**'a basın. Kurulum dosyası kod imzalı olmadığı için bu uyarı ilk kurulumda çıkar; virüs uyarısı değildir. Güncellemeler sessizce kurulur.
+
+**Installing:** if Windows says "Windows protected your PC", click **More info → Run anyway**. The setup isn't code-signed, so this shows on the first install; it isn't a virus warning. Updates install silently.
+'@
+
 $arguments = @('release', 'create', "v$version", $installer.FullName, '--repo', $Repository, '--target', $commit, '--title', "ZeiLand $version")
-$arguments += if ($Notes) { @('--notes', $Notes) } else { @('--generate-notes') }
+# With --generate-notes, the --notes text goes above GitHub's list of changes.
+$arguments += if ($Notes) { @('--notes', "$installNote`n$Notes") } else { @('--notes', $installNote, '--generate-notes') }
 gh @arguments
 if ($LASTEXITCODE) { throw 'gh release create failed' }
