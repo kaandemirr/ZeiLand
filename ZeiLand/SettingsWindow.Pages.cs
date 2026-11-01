@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Globalization;
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
@@ -210,11 +211,24 @@ public partial class SettingsWindow
         }
     }
 
+    private void RenderIslandSize()
+    {
+        foreach (var option in SizeOptions.Children.OfType<RadioButton>())
+        {
+            double scale = double.Parse((string)option.Tag, CultureInfo.InvariantCulture);
+            option.Content = Loc.Percent(scale);
+            option.IsChecked = scale == _settings.IslandScale;
+        }
+    }
+
     private void InitializeAppearance()
     {
         foreach (var option in SkipOptions.Children.OfType<RadioButton>())
             option.Checked += (_, _) => _settings.SkipSeconds = int.Parse((string)option.Tag);
         RenderSkip();
+        foreach (var option in SizeOptions.Children.OfType<RadioButton>())
+            option.Checked += (_, _) => _settings.IslandScale = double.Parse((string)option.Tag, CultureInfo.InvariantCulture);
+        RenderIslandSize();
 
         UpdateRestingStyle();
         RestingThin.Checked += (_, _) => _settings.YieldToTopWindows = true;

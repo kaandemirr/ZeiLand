@@ -25,6 +25,18 @@ public sealed class AppSettings : INotifyPropertyChanged
     public bool ShowGpuTemperature { get; set => Set(ref field, value); } = true;
     public bool ShowRam { get; set => Set(ref field, value); } = true;
 
+    /// <summary>A Bluetooth headset or speaker connecting / disconnecting, with its battery when it reports one.</summary>
+    public bool ShowBluetooth { get; set => Set(ref field, value); } = true;
+
+    /// <summary>A small preview after a screenshot (Win+Shift+S, Snipping Tool), to open or save it.</summary>
+    public bool ShowScreenshots { get; set => Set(ref field, value); } = true;
+
+    /// <summary>A call app (Discord, Teams, Zoom…) using the microphone: the compact island shows the call and its length.</summary>
+    public bool ShowCalls { get; set => Set(ref field, value); } = true;
+
+    /// <summary>Windows notifications (messages etc.) repeated on the island. Off by default: they may be private.</summary>
+    public bool ShowNotifications { get; set => Set(ref field, value); }
+
     // ---- Behaviour ----
 
     /// <summary>"tr" or "en"; null follows Windows' display language.</summary>
@@ -63,6 +75,9 @@ public sealed class AppSettings : INotifyPropertyChanged
     public bool ShowMicButton { get; set => Set(ref field, value); } = true;
 
     // ---- Placement and looks ----
+
+    /// <summary>The island's size: 0.9, 1 (normal), 1.1 or 1.25.</summary>
+    public double IslandScale { get; set => Set(ref field, value is 0.9 or 1.0 or 1.1 or 1.25 ? value : 1.0); } = 1.0;
 
     /// <summary>The monitor the island sits on (its device name, e.g. \\.\DISPLAY2); null for the primary one.</summary>
     public string? IslandMonitor { get; set => Set(ref field, value); }

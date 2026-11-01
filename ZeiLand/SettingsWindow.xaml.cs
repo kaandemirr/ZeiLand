@@ -115,6 +115,7 @@ public partial class SettingsWindow : Window
         RenderMediaSources();
         RenderAod();
         RenderSkip();
+        RenderIslandSize();
         UpdatePosition();
         _ = ShowGif();
         UpdateUpdateStatus();
@@ -194,6 +195,9 @@ public partial class SettingsWindow : Window
                 break;
             case nameof(AppSettings.SkipSeconds):
                 RenderSkip();
+                break;
+            case nameof(AppSettings.IslandScale):
+                RenderIslandSize();
                 break;
             case nameof(AppSettings.YieldToTopWindows):
                 UpdateRestingStyle();

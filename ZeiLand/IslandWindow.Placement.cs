@@ -119,7 +119,7 @@ public partial class IslandWindow
         SetWindowPos(handle, HWND_TOPMOST, centre - width / 2, top, 0, 0, SWP_NOSIZE | SWP_NOACTIVATE);
 
         // Where the compact views sit on screen: windows reaching into this area make them step aside.
-        double scale = VisualTreeHelper.GetDpi(this).DpiScaleX;
+        double scale = VisualTreeHelper.GetDpi(this).DpiScaleX * _scale;
         int halfWidth = (int)Math.Ceiling(CompactMediaView.Width / 2 * scale);
         _topWindows.Zone = new RECT
         {

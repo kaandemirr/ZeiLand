@@ -5,7 +5,7 @@
 A lightweight "Dynamic Island" for Windows 10/11. It sits at the top centre of the screen and changes shape with what is happening. In English and Turkish.
 
 <p align="center">
-  <img src="docs/images/en/player.png" width="640" alt="The open island: cover, progress, skip back / ahead, playback buttons, quick buttons, shortcuts and system stats">
+  <img src="docs/images/en/demo.gif" width="640" alt="ZeiLand in motion: the mini player opens into the full player, then a volume notice, a Bluetooth headset connecting, a notification and a screenshot preview">
 </p>
 
 ## Installing
@@ -28,12 +28,16 @@ The setup:
 <p align="center">
   <img src="docs/images/en/compact.png" width="560" alt="Mini player: cover, song title and bars moving with the sound">
 </p>
+<p align="center">
+  <img src="docs/images/en/player.png" width="640" alt="The open island: cover, progress, skip back / ahead, playback buttons, quick buttons, shortcuts and system stats">
+</p>
 
 | State | When | Looks like |
 |---|---|---|
 | Idle | Nothing is happening | A thin handle hanging from the top edge |
 | Now playing | Spotify, a browser etc. is playing | Album cover (with the playing app's icon in its corner) + title + bars moving with the sound being played (in the cover's colour) |
 | Timer | A timer / stopwatch is running | Orange stopwatch icon + time left / elapsed. In place of the bars if music is playing too |
+| Call | Discord, Teams, Zoom etc. is using the microphone | Green phone + app name + call length; a red struck-through microphone while muted, a green dot while the camera is on |
 | Open player | On hover (with media) | Cover, title, artist, progress (click and drag to seek), ⟲10 ⏮ ⏯ ⏭ 10⟳, quick buttons + system stats |
 | Home | On hover (no media) | Clock, date, battery, quick buttons + system stats |
 | Optimize | The ⚡ button in the system stats | The apps using the most RAM/CPU (with their icons) + close buttons |
@@ -41,6 +45,9 @@ The setup:
 | Volume | The volume changes | Level bar + percentage (1.8 s) |
 | Microphone | The microphone is muted / unmuted (island, shortcut, headset button) | "Microphone off / on" + shortcut (1.8 s) |
 | Sound output | The default output changes (e.g. headphones plugged in) | Headphones / speaker icon + device name (2.5 s) |
+| Bluetooth | A Bluetooth headset or speaker connects / disconnects | Device name + "Connected" / "Disconnected" + battery level if the device reports it, red at 20% and below (3.5 s) |
+| Screenshot | Win+Shift+S or the Snipping Tool copies a screenshot | Thumbnail + Open / Save (6 s; stays while the pointer is on it) |
+| Notification | A Windows notification pops up (off by default) | App icon, app name, title and first line (5 s; stays while the pointer is on it, a click puts it away) |
 | Power | Charger plugged in / out, battery at 20% and 10% | Battery icon + status (1.8 s) |
 | Time's up | A timer ends | Bell + "Time's up", Windows alarm sound; stays until "OK" is pressed |
 
@@ -50,11 +57,18 @@ The setup:
 <p align="center">
   <img src="docs/images/en/notices.png" alt="Notices: volume level, microphone off and sound output">
 </p>
+<p align="center">
+  <img src="docs/images/en/bluetooth-call.png" width="676" alt="A Bluetooth headset connected with its battery level, and a Discord call with its length">
+</p>
+<p align="center">
+  <img src="docs/images/en/screenshot-notification.png" alt="A screenshot preview with Open and Save, and a message notification">
+</p>
 
 - The **mouse wheel** over the island turns the volume up or down.
 - **Left-click** on the tray icon opens the settings. **Right-click** on the island or the tray icon opens a dark menu in the same style as the settings window: Settings, Start with Windows (switch), Exit.
 - When a full-screen app (a game, a video) opens, the island **hides by itself** (Settings → Behaviour → Hide in full screen). With this off, the island stays over the game; but if the game is in exclusive "full screen" mode, Windows draws no window over it, and the game has to be set to "borderless".
 - When a maximised window (e.g. browser tabs) reaches under the island, the compact player stays visible by default. Optionally (Settings → Appearance → Thin line) it **makes room**: it shrinks to the thin handle, and if something is playing, a thin line in the cover's colour (orange for a timer) stays on the handle. Hovering opens it as usual.
+- **Island size:** 90, 100, 110 or 125% (Settings → Appearance), e.g. for high-resolution screens.
 - **Ctrl + drag** moves the island: along the top edge or to another screen. It snaps into place near the centre. The position is stored as a fraction of the screen's width, so it stays put when the resolution or scale changes. If the screen is removed, it goes back to the main screen.
 
 ### Quick buttons
@@ -98,9 +112,9 @@ ZeiLand checks the [GitHub releases](https://github.com/zeigarn/ZeiLand/releases
 Every change in the settings window applies at once and is saved to `%LOCALAPPDATA%\ZeiLand\settings.json`.
 
 - **Language:** Turkish or English (in the Behaviour tab; Windows' language by default). Open windows switch at once.
-- **Island / Show on the island:** now playing (and the moving bars), the volume indicator, charging notices, the microphone/camera lights, clock/date, system stats; in the system stats, CPU, CPU °C, GPU, GPU °C and RAM are chosen one by one. Anything turned off isn't measured at all. **Sources:** the apps playing media are listed; an unticked app's media isn't shown on the island (while it plays, another player's is shown, the one that started first).
+- **Island / Show on the island:** now playing (and the moving bars), the microphone/camera lights, the volume indicator, charging notices, Bluetooth headsets and speakers, the call indicator, the screenshot preview, notifications (off by default), clock/date, system stats; in the system stats, CPU, CPU °C, GPU, GPU °C and RAM are chosen one by one. Anything turned off isn't measured at all. **Sources:** the apps playing media are listed; an unticked app's media isn't shown on the island (while it plays, another player's is shown, the one that started first).
 - **Island / CPU temperature:** shows its status; installs the driver or restarts the app as administrator if needed.
-- **Appearance:** the closed look (mini player / thin line, with a picture preview), the position ("Centre"), the GIF in the player, the skip length (off / 5 / 10 / 15 / 30 s) and which quick buttons (timer / stopwatch, sound in / out, microphone) show.
+- **Appearance:** the closed look (mini player / thin line, with a picture preview), the position ("Centre"), the island size (90 / 100 / 110 / 125%), the GIF in the player, the skip length (off / 5 / 10 / 15 / 30 s) and which quick buttons (timer / stopwatch, sound in / out, microphone) show.
 - **AOD:** as above.
 - **Shortcuts:** as above.
 - **Behaviour:** open delay (instant / normal / slow), wheel for volume and the size of one notch (1% / 2% / 5%), microphone shortcut (press the button, then the new keys; Esc cancels, Backspace removes it; warns if another app uses it), timer sound, hide in full screen (with it off, the island stays over the game; but if the game is in exclusive "full screen" mode, no window shows over it, so set the game to "borderless", e.g. in LoL: Settings → Video → Window mode), Start with Windows.
@@ -116,6 +130,22 @@ The sources are the ones using the hardware directly; nothing is checked continu
 - **Camera:** processes taking frames from a camera, as Windows' camera frame server reports them (Media Foundation `IMFSensorActivityMonitor`). A report comes when it changes.
 
 Up to 0.5.0, Windows' privacy indicator registry (`CapabilityAccessManager\ConsentStore`) was read; newer Windows versions stopped updating it, so apps like Discord didn't show.
+
+### Calls
+
+The call indicator uses the same microphone sessions as the lights (and works with the lights turned off). When a call app (Discord, Teams, Zoom, Slack, Skype, WhatsApp, Telegram, Signal, Viber, Webex) starts using the microphone, the compact view shows the app and how long the call has lasted; when the app lets go of the microphone, the island goes back to what it showed before. Discord keeps the microphone open for as long as you are in a voice channel, so all of that time counts. The length is redrawn once a second, only while it is on screen.
+
+### Bluetooth headsets and speakers
+
+Windows reports when an audio output becomes active or goes away (`IMMNotificationClient`). Only then does ZeiLand check whether it is a Bluetooth device and read its battery level, from the same property Windows' Bluetooth settings show. Not every device reports its battery; then just the name and the status show. If the level arrives a moment after the connection, the notice is updated in place.
+
+### Screenshot preview
+
+ZeiLand is told when the clipboard changes (`AddClipboardFormatListener`; nothing is polled) and reacts only when the Snipping Tool (Win+Shift+S) has put an image there; copying a picture anywhere else shows nothing. **Open** opens the screenshot in the default image viewer, **Save** puts it in Pictures\Screenshots (depending on its own settings, the Snipping Tool may save it there too). The screenshot is kept as a single temporary file under `%TEMP%\ZeiLand`, replaced by the next one.
+
+### Notifications
+
+Off by default: the contents of notifications (e.g. messages) show on the island, so keep this in mind while sharing your screen. Windows doesn't send desktop apps its "notification added" event, so ZeiLand catches the moment a notification pops up (the shell shows the notification window; `SetWinEventHook`) and only then reads the notification list once. Nothing is polled, and notifications that Windows holds back (do not disturb, full screen, games) don't show on the island either. Windows has to allow access to notifications (Settings → Privacy & security → Notifications).
 
 ### Optimize
 
@@ -159,6 +189,7 @@ The sensor starts only while the CPU temperature is shown and the island is firs
 - **The bars follow the real sound, only while visible:** while the compact media view is on screen and music is playing, Core Audio's peak meter (`IAudioMeterInformation`, the source of the volume mixer's bar) is read ~30 times a second. No audio data is taken and no FFT is done. Automatic gain makes quiet and loud songs look equally lively; in silence the bars stop and nothing is redrawn. Reading stops when paused, when the island opens or in full screen.
 - **The bars listen only to the playing app:** the meter is read from the playing app's own audio sessions (the app's bar in the volume mixer); a Discord call or a game's sound doesn't move the bars. If the app has no separate audio session, it falls back to the whole output.
 - **The top window is followed through events:** Windows reports when the foreground window changes, and only when that app's windows move or resize (`SetWinEventHook`); the window's real bounds come from DWM. No timer.
+- **Clipboard and notifications through events:** the clipboard listener and the notification window's WinEvent wake ZeiLand only when something happens; a Bluetooth device's battery is read once, when it connects.
 - **The shortcut isn't a keyboard hook:** `RegisterHotKey`; Windows sends a message only when that key combination is pressed.
 - **The timer doesn't count:** the end of a countdown is awaited with a single timer; the time is redrawn only while on screen and only when a digit changes (once a second).
 - **System stats are read only while the island is open:** no measurement runs in the background.

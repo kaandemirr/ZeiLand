@@ -39,6 +39,9 @@ internal sealed class VolumeService : IDisposable
     /// <summary>Another output device became the default (from the island, Windows or a headset connecting).</summary>
     public event Action? OutputChanged;
 
+    /// <summary>An endpoint became available (true) or went away (false), e.g. a Bluetooth headset connecting.</summary>
+    public event Action<string, bool>? DeviceConnectionChanged;
+
     public float Level { get; private set; }
     public bool IsMuted { get; private set; }
 
@@ -303,7 +306,13 @@ internal sealed class VolumeService : IDisposable
             return 0;
         }
 
-        public int OnDeviceStateChanged(string deviceId, int newState) => 0;
+        public int OnDeviceStateChanged(string deviceId, int newState)
+        {
+            const int active = 1;
+            owner._dispatcher.InvokeAsync(() => owner.DeviceConnectionChanged?.Invoke(deviceId, newState == active));
+            return 0;
+        }
+
         public int OnDeviceAdded(string deviceId) => 0;
         public int OnDeviceRemoved(string deviceId) => 0;
         public int OnPropertyValueChanged(string deviceId, PropertyKey key) => 0;

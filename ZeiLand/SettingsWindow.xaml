@@ -451,6 +451,18 @@
                         <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding ShowPower}"
                                   Content="{DynamicResource PowerNotices}" Tag="{DynamicResource PowerNoticesTip}" />
                         <Border Style="{StaticResource Divider}" />
+                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding ShowBluetooth}"
+                                  Content="{DynamicResource BluetoothNotices}" Tag="{DynamicResource BluetoothNoticesTip}" />
+                        <Border Style="{StaticResource Divider}" />
+                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding ShowCalls}"
+                                  Content="{DynamicResource CallIndicator}" Tag="{DynamicResource CallIndicatorTip}" />
+                        <Border Style="{StaticResource Divider}" />
+                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding ShowScreenshots}"
+                                  Content="{DynamicResource ScreenshotPreview}" Tag="{DynamicResource ScreenshotPreviewTip}" />
+                        <Border Style="{StaticResource Divider}" />
+                        <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding ShowNotifications}"
+                                  Content="{DynamicResource IslandNotifications}" Tag="{DynamicResource IslandNotificationsTip}" />
+                        <Border Style="{StaticResource Divider}" />
                         <CheckBox Style="{StaticResource Switch}" IsChecked="{Binding ShowClock}"
                                   Content="{DynamicResource ClockDate}" Tag="{DynamicResource ClockDateTip}" />
                         <Border Style="{StaticResource Divider}" />
@@ -591,6 +603,26 @@
                         </StackPanel>
                         <Button x:Name="CentreButton" Grid.Column="1" Style="{StaticResource ActionButton}" Margin="0"
                                 VerticalAlignment="Center" Content="{DynamicResource Centre}" />
+                    </Grid>
+                </Border>
+
+                <TextBlock Style="{StaticResource SectionTitle}" Text="{DynamicResource IslandSize}" />
+                <Border Style="{StaticResource Card}">
+                    <Grid Margin="16,10,16,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+                        <TextBlock VerticalAlignment="Center" Margin="0,0,12,0" FontSize="11.5" TextWrapping="Wrap"
+                                   Foreground="{StaticResource SecondaryText}" Text="{DynamicResource IslandSizeTip}" />
+                        <Border Grid.Column="1" Padding="2" CornerRadius="7" Background="#1AFFFFFF" VerticalAlignment="Center">
+                            <StackPanel x:Name="SizeOptions" Orientation="Horizontal">
+                                <RadioButton Style="{StaticResource Segment}" GroupName="Size" Tag="0.9" />
+                                <RadioButton Style="{StaticResource Segment}" GroupName="Size" Tag="1" />
+                                <RadioButton Style="{StaticResource Segment}" GroupName="Size" Tag="1.1" />
+                                <RadioButton Style="{StaticResource Segment}" GroupName="Size" Tag="1.25" />
+                            </StackPanel>
+                        </Border>
                     </Grid>
                 </Border>
 

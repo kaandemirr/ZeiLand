@@ -76,7 +76,7 @@ internal struct PropVariant
     [FieldOffset(8)] public IntPtr Pointer;
     [FieldOffset(8)] public uint UInt32;
 
-    public const ushort VT_UI4 = 19, VT_LPWSTR = 31;
+    public const ushort VT_UI4 = 19, VT_LPWSTR = 31, VT_CLSID = 72;
 
     [DllImport("ole32.dll")]
     public static extern int PropVariantClear(ref PropVariant value);

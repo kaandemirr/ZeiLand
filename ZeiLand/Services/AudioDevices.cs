@@ -17,6 +17,7 @@ internal static class AudioDevices
     private static readonly PropertyKey DeviceDescription = Key("a45c254e-df1c-4efd-8020-67d146a850e0", 2);
     private static readonly PropertyKey InterfaceName = Key("026e516e-b814-414b-83cd-856d6fef4822", 2);
     private static readonly PropertyKey FormFactor = Key("1da5d803-d492-4edd-8c23-e0c0ffee7f0e", 0);
+    private static readonly PropertyKey ContainerId = Key("8c7ed206-3f8a-4827-b3ab-ae9e1faefc6c", 2);
 
     public static List<AudioDevice> GetOutputs() => GetDevices(EDataFlow.Render, ERole.Multimedia);
 
@@ -60,6 +61,43 @@ internal static class AudioDevices
             if (enumerator is not null) Marshal.ReleaseComObject(enumerator);
         }
         return devices;
+    }
+
+    /// <summary>An output rather than a microphone: render endpoint ids start with {0.0.0.</summary>
+    public static bool IsOutput(string deviceId) => deviceId.StartsWith("{0.0.0.", StringComparison.Ordinal);
+
+    /// <summary>
+    /// An endpoint, connected or not, and the container it belongs to: the physical device, which also holds
+    /// e.g. a Bluetooth headset's battery level.
+    /// </summary>
+    public static (AudioDevice Device, Guid Container)? Find(string deviceId)
+    {
+        IMMDeviceEnumerator? enumerator = null;
+        IMMDevice? device = null;
+        try
+        {
+            enumerator = (IMMDeviceEnumerator)new MMDeviceEnumerator();
+            enumerator.GetDevice(deviceId, out device);
+            if (Describe(device, null) is not { } description) return null;
+            device.OpenPropertyStore(StgmRead, out var properties);
+            try
+            {
+                return ReadGuid(properties, ContainerId) is { } container ? (description, container) : null;
+            }
+            finally
+            {
+                Marshal.ReleaseComObject(properties);
+            }
+        }
+        catch (COMException)
+        {
+            return null;
+        }
+        finally
+        {
+            if (device is not null) Marshal.ReleaseComObject(device);
+            if (enumerator is not null) Marshal.ReleaseComObject(enumerator);
+        }
     }
 
     /// <summary>Makes a device the default for everything (media, games, calls). False if Windows refused.</summary>
@@ -128,6 +166,19 @@ internal static class AudioDevices
         try
         {
             return value.Type == PropVariant.VT_UI4 ? value.UInt32 : null;
+        }
+        finally
+        {
+            PropVariant.PropVariantClear(ref value);
+        }
+    }
+
+    private static Guid? ReadGuid(IPropertyStore properties, PropertyKey key)
+    {
+        properties.GetValue(ref key, out var value);
+        try
+        {
+            return value.Type == PropVariant.VT_CLSID ? Marshal.PtrToStructure<Guid>(value.Pointer) : null;
         }
         finally
         {

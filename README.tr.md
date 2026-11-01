@@ -5,7 +5,7 @@
 Windows 10/11 için hafif bir "Dynamic Island". Ekranın üst ortasında durur, olaylara göre şekil değiştirir. Türkçe ve İngilizce.
 
 <p align="center">
-  <img src="docs/images/player.png" width="640" alt="Açık ada: kapak, ilerleme, ileri / geri sarma, oynatma düğmeleri, hızlı düğmeler, kısayollar ve sistem bilgileri">
+  <img src="docs/images/demo.gif" width="640" alt="ZeiLand hareket halinde: mini oynatıcı açılıp tam oynatıcı olur, ardından ses göstergesi, bağlanan Bluetooth kulaklık, bir bildirim ve ekran görüntüsü önizlemesi">
 </p>
 
 ## Kurulum
@@ -28,12 +28,16 @@ Kurulum:
 <p align="center">
   <img src="docs/images/compact.png" width="560" alt="Mini oynatıcı: kapak, şarkı adı ve sese göre oynayan çubuklar">
 </p>
+<p align="center">
+  <img src="docs/images/player.png" width="640" alt="Açık ada: kapak, ilerleme, ileri / geri sarma, oynatma düğmeleri, hızlı düğmeler, kısayollar ve sistem bilgileri">
+</p>
 
 | Durum | Ne zaman | Görünüm |
 |---|---|---|
 | Boşta | Hiçbir şey olmuyorken | Üst kenardan sarkan ince tutamak |
 | Çalan medya | Spotify, tarayıcı vb. çalarken | Albüm kapağı (köşesinde çalan uygulamanın simgesi) + başlık + çalan sese göre oynayan çubuklar (kapak renginde) |
 | Zamanlayıcı | Zamanlayıcı / kronometre çalışırken | Turuncu kronometre simgesi + kalan / geçen süre. Müzik de çalıyorsa çubukların yerinde |
+| Görüşme | Discord, Teams, Zoom vb. mikrofonu kullanırken | Yeşil telefon + uygulama adı + görüşme süresi; sessizdeyken kırmızı üstü çizili mikrofon, kamera açıkken yeşil nokta |
 | Genişlemiş oynatıcı | Fareyle üzerine gelince (medya varsa) | Kapak, başlık, sanatçı, ilerleme (tıklayıp sürükleyerek sarılır), ⟲10 ⏮ ⏯ ⏭ 10⟳, hızlı düğmeler + sistem bilgileri |
 | Ana ekran | Fareyle üzerine gelince (medya yoksa) | Saat, tarih, pil, hızlı düğmeler + sistem bilgileri |
 | Optimize | Sistem bilgilerindeki ⚡ düğmesi | En çok RAM/CPU kullanan uygulamalar (simgeleriyle) + kapat düğmeleri |
@@ -41,6 +45,9 @@ Kurulum:
 | Ses | Ses değişince | Seviye çubuğu + yüzde (1,8 sn) |
 | Mikrofon | Mikrofon kapatılıp açılınca (ada, kısayol, kulaklık düğmesi) | "Mikrofon kapalı / açık" + kısayol (1,8 sn) |
 | Ses çıkışı | Varsayılan çıkış değişince (ör. kulaklık bağlanınca) | Kulaklık / hoparlör simgesi + cihaz adı (2,5 sn) |
+| Bluetooth | Bluetooth kulaklık veya hoparlör bağlanınca / bağlantı kesilince | Cihaz adı + "Bağlandı" / "Bağlantı kesildi" + cihaz bildiriyorsa pil seviyesi, %20 ve altında kırmızı (3,5 sn) |
+| Ekran görüntüsü | Win+Shift+S veya Ekran Alıntısı Aracı bir görüntü kopyalayınca | Küçük resim + Aç / Kaydet (6 sn; fare üzerindeyken kalır) |
+| Bildirim | Bir Windows bildirimi açılınca (varsayılan olarak kapalı) | Uygulama simgesi, uygulama adı, başlık ve ilk satır (5 sn; fare üzerindeyken kalır, tıklayınca kapanır) |
 | Güç | Şarj takılıp çıkınca / pil %20 ve %10 | Pil simgesi + durum (1,8 sn) |
 | Süre doldu | Zamanlayıcı bitince | Zil + "Süre doldu", Windows alarm sesi; "Tamam"a basılana kadar kalır |
 
@@ -50,11 +57,18 @@ Kurulum:
 <p align="center">
   <img src="docs/images/notices.png" alt="Bildirimler: ses seviyesi, mikrofon kapalı ve ses çıkışı">
 </p>
+<p align="center">
+  <img src="docs/images/bluetooth-call.png" width="676" alt="Pil seviyesiyle bağlanan Bluetooth kulaklık ve süresiyle bir Discord görüşmesi">
+</p>
+<p align="center">
+  <img src="docs/images/screenshot-notification.png" alt="Aç ve Kaydet düğmeleriyle ekran görüntüsü önizlemesi ve bir mesaj bildirimi">
+</p>
 
 - Adanın üzerinde **fare tekerleği** sesi açar veya kısar.
 - Tepsi simgesine **sol tık** ayarları açar. Ada'ya veya tepsi simgesine **sağ tık**, ayarlar penceresiyle aynı tarzda koyu bir menü açar: Ayarlar, Windows ile başlat (anahtar), Çıkış.
 - Tam ekran bir uygulama (oyun, video) açılınca ada **kendiliğinden gizlenir** (Ayarlar → Davranış → Tam ekranda gizle). Bu kapatılırsa ada oyunun üstünde kalır; ama oyun "tam ekran" (exclusive) modundaysa Windows üstüne hiçbir pencere çizmez, oyunun "kenarlıksız" moda alınması gerekir.
 - Büyütülmüş bir pencere (ör. tarayıcı sekmeleri) adanın altına uzandığında kompakt oynatıcı varsayılan olarak görünür kalır. İstenirse (Ayarlar → Görünüm → İnce çizgi) **yer açar**: ince tutamağa döner, çalan bir şey varsa tutamakta kapak renginde (zamanlayıcıda turuncu) ince bir çizgi kalır. Üzerine gelince yine açılır.
+- **Ada boyutu:** %90, %100, %110 veya %125 (Ayarlar → Görünüm), ör. yüksek çözünürlüklü ekranlar için.
 - **Ctrl + sürükle** adayı taşır: üst kenar boyunca ya da başka bir ekrana. Ortaya yaklaşınca yerine oturur. Konum, ekran ve genişliğin oranı olarak saklanır; çözünürlük veya ölçek değişse de yerinde kalır. Ekran çıkarılırsa ana ekrana döner.
 
 ### Hızlı düğmeler
@@ -98,9 +112,9 @@ ZeiLand, [GitHub sürümlerini](https://github.com/zeigarn/ZeiLand/releases) aç
 Ayarlar penceresindeki her değişiklik anında uygulanır ve `%LOCALAPPDATA%\ZeiLand\settings.json` dosyasına kaydedilir.
 
 - **Dil:** Türkçe ya da İngilizce (Davranış sekmesinde; varsayılan Windows'un dili). Açık pencereler anında değişir.
-- **Ada / Adada göster:** çalan medya (ve oynayan çubuklar), ses göstergesi, şarj bildirimleri, mikrofon/kamera ışıkları, saat/tarih, sistem bilgileri; sistem bilgilerinde CPU, CPU °C, GPU, GPU °C, RAM tek tek seçilir. Kapatılan bilgi hiç ölçülmez. **Kaynaklar:** medya çalan uygulamalar listelenir; işareti kaldırılanın medyası adada gösterilmez (o çalarken başka bir oynatıcınınki, önce çalanı, gösterilir).
+- **Ada / Adada göster:** çalan medya (ve oynayan çubuklar), mikrofon/kamera ışıkları, ses göstergesi, şarj bildirimleri, Bluetooth kulaklık ve hoparlörler, görüşme göstergesi, ekran görüntüsü önizlemesi, bildirimler (varsayılan olarak kapalı), saat/tarih, sistem bilgileri; sistem bilgilerinde CPU, CPU °C, GPU, GPU °C, RAM tek tek seçilir. Kapatılan bilgi hiç ölçülmez. **Kaynaklar:** medya çalan uygulamalar listelenir; işareti kaldırılanın medyası adada gösterilmez (o çalarken başka bir oynatıcınınki, önce çalanı, gösterilir).
 - **Ada / CPU sıcaklığı:** durumunu gösterir; gerekiyorsa sürücüyü kurar veya uygulamayı yönetici olarak yeniden başlatır.
-- **Görünüm:** kapalıyken görünüm (mini oynatıcı / ince çizgi, resimli önizlemeyle), konum ("Ortaya al"), oynatıcıdaki GIF, ileri / geri sarma süresi (kapalı / 5 / 10 / 15 / 30 sn) ve hangi hızlı düğmelerin (zamanlayıcı / kronometre, ses giriş / çıkış, mikrofon) görüneceği.
+- **Görünüm:** kapalıyken görünüm (mini oynatıcı / ince çizgi, resimli önizlemeyle), konum ("Ortaya al"), ada boyutu (%90 / %100 / %110 / %125), oynatıcıdaki GIF, ileri / geri sarma süresi (kapalı / 5 / 10 / 15 / 30 sn) ve hangi hızlı düğmelerin (zamanlayıcı / kronometre, ses giriş / çıkış, mikrofon) görüneceği.
 - **AOD:** yukarıdaki gibi.
 - **Kısayollar:** yukarıdaki gibi.
 - **Davranış:** açılma gecikmesi (anında / normal / yavaş), tekerlekle ses ve bir tıkın adımı (%1 / %2 / %5), mikrofon kısayolu (düğmeye basıp yeni tuşlara basılır; Esc vazgeçer, Geri tuşu kaldırır; başka bir uygulama kullanıyorsa uyarır), zamanlayıcı sesi, tam ekranda gizle (kapalıyken ada oyunun üstünde kalır; ama oyun "tam ekran" (exclusive) modundaysa üstünde hiçbir pencere görünmez, oyun "kenarlıksız" moda alınmalı, ör. LoL'de Ayarlar → Video → Pencere modu), Windows ile başlat.
@@ -116,6 +130,22 @@ Kaynaklar doğrudan donanımı kullananlardır, hiçbir şey sürekli kontrol ed
 - **Kamera:** Kameradan görüntü alan süreçler, Windows'un kamera çerçeve sunucusunun bildirdiği şekliyle (Media Foundation `IMFSensorActivityMonitor`). Değişince rapor gelir.
 
 0.5.0'a kadar Windows'un gizlilik göstergesi kaydı (`CapabilityAccessManager\ConsentStore`) okunuyordu; yeni Windows sürümleri bu kaydı güncellemeyi bıraktığı için Discord gibi uygulamalar görünmüyordu.
+
+### Görüşmeler
+
+Görüşme göstergesi ışıklarla aynı mikrofon oturumlarını kullanır (ışıklar kapalıyken de çalışır). Bir görüşme uygulaması (Discord, Teams, Zoom, Slack, Skype, WhatsApp, Telegram, Signal, Viber, Webex) mikrofonu kullanmaya başlayınca kompakt görünümde uygulama ve görüşmenin ne kadar sürdüğü görünür; uygulama mikrofonu bırakınca ada önceki haline döner. Discord, ses kanalında kaldığın sürece mikrofonu açık tutar; bu yüzden kanaldaki sürenin tamamı sayılır. Süre yalnızca ekrandayken, saniyede bir yeniden çizilir.
+
+### Bluetooth kulaklık ve hoparlörler
+
+Bir ses çıkışı etkinleşince veya kaybolunca Windows haber verir (`IMMNotificationClient`). ZeiLand ancak o zaman cihazın Bluetooth olup olmadığına bakar ve pil seviyesini Windows'un Bluetooth ayarlarında gösterilen özellikten okur. Her cihaz pilini bildirmez; o zaman yalnızca ad ve durum görünür. Seviye bağlantıdan biraz sonra gelirse bildirim yerinde güncellenir.
+
+### Ekran görüntüsü önizlemesi
+
+Pano değişince ZeiLand'e haber gelir (`AddClipboardFormatListener`; hiçbir şey yoklanmaz) ve yalnızca Ekran Alıntısı Aracı (Win+Shift+S) bir görüntü koyduysa tepki verir; başka bir yerden resim kopyalamak bir şey göstermez. **Aç** görüntüyü varsayılan resim görüntüleyicide açar, **Kaydet** Resimler\Ekran Görüntüleri klasörüne koyar (Ekran Alıntısı Aracı kendi ayarına göre oraya zaten kaydediyor olabilir). Görüntü `%TEMP%\ZeiLand` altında tek bir geçici dosya olarak tutulur, bir sonrakiyle değişir.
+
+### Bildirimler
+
+Varsayılan olarak kapalıdır: bildirimlerin içeriği (ör. mesajlar) adada görünür, ekran paylaşırken bunu unutma. Windows masaüstü uygulamalarına "bildirim eklendi" olayını göndermez; bu yüzden ZeiLand bir bildirimin açıldığı anı yakalar (kabuk bildirim penceresini gösterir; `SetWinEventHook`) ve ancak o zaman bildirim listesini bir kez okur. Hiçbir şey yoklanmaz; Windows'un göstermediği bildirimler (rahatsız etmeyin, tam ekran, oyun) adada da görünmez. Windows'un bildirimlere erişime izin vermesi gerekir (Ayarlar → Gizlilik ve güvenlik → Bildirimler).
 
 ### Optimize
 
@@ -159,6 +189,7 @@ Sensör yalnızca CPU sıcaklığı gösterilirken ve ada ilk açıldığında b
 - **Çubuklar gerçek sese göre, yalnızca görünürken oynar:** Kompakt medya görünümü ekrandayken ve müzik çalarken, saniyede ~30 kez Core Audio'nun tepe seviye ölçeri (`IAudioMeterInformation`, ses karıştırıcısındaki çubuğun kaynağı) okunur. Ses verisi alınmaz, FFT yapılmaz. Otomatik kazanç sessiz ve gürültülü şarkıları eşit canlı gösterir; sessizlikte çubuklar durur ve yeniden çizim olmaz. Duraklatınca, ada açılınca veya tam ekranda okuma da durur.
 - **Çubuklar yalnızca çalan uygulamayı dinler:** Ölçer, medyayı çalan uygulamanın kendi ses oturumlarından okunur (ses karıştırıcısındaki uygulama çubuğu); Discord'daki konuşma veya bir oyunun sesi çubukları oynatmaz. Uygulamanın ayrı bir ses oturumu yoksa tüm çıkışa geri dönülür.
 - **Üstteki pencere olayla izlenir:** Ön plandaki pencere değişince ve yalnızca o uygulamanın pencereleri taşınınca/boyutlanınca Windows haber verir (`SetWinEventHook`); pencerenin gerçek sınırı DWM'den okunur. Zamanlayıcı yok.
+- **Pano ve bildirimler olayla gelir:** Pano dinleyicisi ve bildirim penceresinin WinEvent'i ZeiLand'i yalnızca bir şey olunca uyandırır; Bluetooth cihazın pili bir kez, bağlanınca okunur.
 - **Kısayol klavye kancası değildir:** `RegisterHotKey`; Windows yalnızca o tuş birleşimine basılınca mesaj gönderir.
 - **Zamanlayıcı saymaz:** Geri sayımın bitişi tek bir zamanlayıcıyla beklenir; süre, yalnızca ekrandayken ve rakam değiştiği anda (saniyede bir) yeniden çizilir.
 - **Sistem bilgileri yalnızca ada açıkken okunur:** Arka planda hiçbir ölçüm çalışmaz.

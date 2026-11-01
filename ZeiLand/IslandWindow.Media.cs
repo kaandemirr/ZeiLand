@@ -82,7 +82,7 @@ public partial class IslandWindow
         MediaGif.Measure(any);
         MediaActions.Measure(any);
         double side = Math.Max(MediaGif.DesiredSize.Width, MediaActions.DesiredSize.Width) + 6;
-        return Math.Clamp(36 + PlayerControls.DesiredSize.Width + 2 * side, 380, Width - 40); // 18 + 18: the view's padding
+        return Math.Clamp(36 + PlayerControls.DesiredSize.Width + 2 * side, 380, BaseWidth - 40); // 18 + 18: the view's padding
     }
 
     private void UpdateSourceIcon()

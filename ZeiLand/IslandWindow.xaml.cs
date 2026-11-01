@@ -7,6 +7,7 @@ using System.Windows.Input;
 using System.Windows.Interop;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
+using System.Windows.Media.Imaging;
 using System.Windows.Threading;
 using ZeiLand.Animation;
 using ZeiLand.Native;
@@ -20,13 +21,24 @@ public partial class IslandWindow : Window
 {
     private enum View
     {
-        Idle, CompactMedia, CompactTimer, ExpandedMedia, Home,
+        Idle, CompactMedia, CompactTimer, CompactCall, ExpandedMedia, Home,
         Optimize, Devices, TimerPicker, // panels opened from the expanded island
         Volume, Power, Microphone, Output, Notice, // transient
+        Screenshot, Notification, // transient, and they stay while the pointer is on them
         TimerDone,
     }
 
     private const double MaxRadius = 32;
+
+    // The window's size at 100%; the island size setting scales the window and everything in it.
+    private const double BaseWidth = 472, BaseHeight = 320;
+
+    // Apps whose use of the microphone means a call (executable names).
+    private static readonly HashSet<string> CallApps = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Discord", "DiscordPTB", "DiscordCanary", "ms-teams", "Teams", "Zoom", "Slack", "Skype",
+        "WhatsApp", "WhatsApp.Root", "Telegram", "Signal", "Viber", "CiscoCollabHost", "Webex",
+    };
 
     /// <summary>The room for the user's GIF, left of the player's controls.</summary>
     internal static readonly Size GifSlot = new(84, 38);
@@ -67,6 +79,7 @@ public partial class IslandWindow : Window
     private readonly TimerService _timer;
     private readonly LevelMeter _levelMeter;
     private readonly TopWindowWatcher _topWindows = new();
+    private readonly NotificationWatcher _notifications = new();
     private readonly Dictionary<View, FrameworkElement> _views;
     private readonly RectangleGeometry _shape = new();
     private readonly RectangleGeometry _bridge = new(Rect.Empty);
@@ -80,6 +93,7 @@ public partial class IslandWindow : Window
     private readonly DispatcherTimer _optimizeTimer;
     private readonly DispatcherTimer _disarmTimer;
     private readonly DispatcherTimer _timerTick;
+    private readonly DispatcherTimer _callTick;
 
     private View _current = View.Idle;
     private View? _transient;
@@ -91,6 +105,18 @@ public partial class IslandWindow : Window
     private bool _microphoneMuted;
     private Brush _accent = Brushes.White;
     private string? _gifPath;
+    private double _scale = 1;
+
+    // The call app holding the microphone, and since when.
+    private AppUse? _call;
+    private DateTime _callSince;
+
+    // Bluetooth devices being looked at (a speaker's endpoints connect together), and the last one announced.
+    private readonly HashSet<Guid> _checkingBluetooth = [];
+    private (Guid Container, bool Connected, DateTime At) _lastBluetooth;
+
+    // The latest screenshot, saved as a temporary file to open or save.
+    private string? _screenshotPath;
 
     // Optimize panel state: apps asked to close (name -> memory, to report what was freed),
     // and the app whose "terminate" button is waiting for a confirming second click.
@@ -127,6 +153,7 @@ public partial class IslandWindow : Window
             [View.Idle] = IdleView,
             [View.CompactMedia] = CompactMediaView,
             [View.CompactTimer] = CompactTimerView,
+            [View.CompactCall] = CompactCallView,
             [View.ExpandedMedia] = ExpandedMediaView,
             [View.Home] = HomeView,
             [View.Optimize] = OptimizeView,
@@ -137,6 +164,8 @@ public partial class IslandWindow : Window
             [View.Microphone] = MicrophoneView,
             [View.Output] = OutputView,
             [View.Notice] = NoticeView,
+            [View.Screenshot] = ScreenshotView,
+            [View.Notification] = NotificationView,
             [View.TimerDone] = TimerDoneView,
         };
         foreach (var view in _views.Values) view.RenderTransform = new ScaleTransform(1, 1);
@@ -178,16 +207,31 @@ public partial class IslandWindow : Window
         // Only runs while a running timer is on screen, once per second as its display changes.
         _timerTick = new DispatcherTimer(DispatcherPriority.Background);
         _timerTick.Tick += (_, _) => UpdateTimerDisplay();
+        // Only runs while a call is on screen, once per second.
+        _callTick = new DispatcherTimer(DispatcherPriority.Background);
+        _callTick.Tick += (_, _) => UpdateCallDisplay();
 
         // Root has no background, so it only sees the pointer over the island or the hover bridge.
         Root.MouseEnter += (_, _) =>
         {
             _leaveTimer.Stop();
+            // A screenshot preview or a notification stays while the pointer is on it, and doesn't open the island.
+            if (IsLingering)
+            {
+                _transientTimer.Stop();
+                return;
+            }
             if (!_expanded) _hoverTimer.Start();
         };
         Root.MouseLeave += (_, _) =>
         {
             _hoverTimer.Stop();
+            if (IsLingering)
+            {
+                _transientTimer.Interval = TimeSpan.FromSeconds(2);
+                _transientTimer.Start();
+                return;
+            }
             if (_expanded) _leaveTimer.Start();
         };
         // Back over the island itself: the area it gave up while shrinking needn't stay hoverable.
@@ -200,7 +244,8 @@ public partial class IslandWindow : Window
         Root.MouseLeftButtonDown += (_, _) =>
         {
             _hoverTimer.Stop();
-            SetExpanded(true);
+            if (_transient == View.Notification) EndTransient(); // a click puts it away
+            else if (_transient != View.Screenshot) SetExpanded(true);
         };
         Root.MouseRightButtonUp += (_, e) =>
         {
@@ -269,16 +314,25 @@ public partial class IslandWindow : Window
             _timerDone = false;
             Refresh();
         };
+        ScreenshotThumb.MouseLeftButtonUp += (_, _) => OpenScreenshot();
+        ScreenshotOpenButton.Click += (_, _) => OpenScreenshot();
+        ScreenshotSaveButton.Click += (_, _) => SaveScreenshot();
 
         _media.Changed += OnMediaChanged;
         _volume.Changed += OnVolumeChanged;
         _volume.OutputChanged += OnOutputChanged;
+        _volume.DeviceConnectionChanged += OnDeviceConnectionChanged;
+        _notifications.Arrived += ShowNotification;
         _microphone.Changed += OnMicrophoneChanged;
         _timer.Changed += OnTimerChanged;
         _timer.Finished += OnTimerFinished;
         _privacy.Changed += UpdatePrivacy;
         _topWindows.Changed += Refresh;
-        Closed += (_, _) => _topWindows.Dispose();
+        Closed += (_, _) =>
+        {
+            _topWindows.Dispose();
+            _notifications.Dispose();
+        };
         power.PowerSourceChanged += () => ShowPower(lowBattery: false);
         power.BatteryLow += () => ShowPower(lowBattery: true);
         _settings.PropertyChanged += (_, _) => ApplySettings();
@@ -292,6 +346,7 @@ public partial class IslandWindow : Window
             // e.g. hidden behind a full-screen game
             UpdateLevelBars();
             UpdateTimerDisplay();
+            UpdateCallDisplay();
         };
 
         _microphoneMuted = _microphone.IsMuted;
@@ -301,8 +356,8 @@ public partial class IslandWindow : Window
 
     public event Action? MenuRequested;
 
-    /// <summary>Open, counting down or waiting to be dismissed: not the moment to restart for an update.</summary>
-    public bool IsBusy => _expanded || _timer.IsActive || _timerDone;
+    /// <summary>Open, counting down, in a call or waiting to be dismissed: not the moment to restart for an update.</summary>
+    public bool IsBusy => _expanded || _timer.IsActive || _timerDone || _call is not null;
 
     /// <summary>A short message from the app itself, shown like the volume or charger messages.</summary>
     public void ShowNotice(string glyph, string text, int milliseconds = 3000)
@@ -340,8 +395,10 @@ public partial class IslandWindow : Window
     private void ApplySettings()
     {
         _hoverTimer.Interval = TimeSpan.FromMilliseconds(Math.Max(_settings.HoverDelayMs, 1));
-        _privacy.Enabled = _settings.ShowPrivacyIndicators;
+        _privacy.Enabled = _settings.ShowPrivacyIndicators || _settings.ShowCalls;
+        _notifications.Enabled = _settings.ShowNotifications;
         _topWindows.Enabled = _settings.YieldToTopWindows;
+        ApplyScale();
         _stats.IncludeGpu = _settings.ShowStats && _settings.ShowGpu;
         _stats.IncludeCpuTemperature = _settings.WantsCpuTemperature;
 
@@ -366,6 +423,7 @@ public partial class IslandWindow : Window
 
         // Newly enabled readings (e.g. the CPU temperature sensor) start with a fresh measurement window.
         if (stats && IsExpanded(_current)) _stats.Begin();
+        UpdatePrivacy(); // the lights or the call indicator may have been turned on or off
 
         // The current view may have changed size, or may not be allowed any more.
         UpdateExpandedSizes();
@@ -498,17 +556,133 @@ public partial class IslandWindow : Window
         return button;
     }
 
-    private void OnOutputChanged()
+    private async void OnOutputChanged()
     {
         if (_current == View.Devices) RefreshDevices();
         // Picked from the panel (or the island is open anyway): the panel / player already shows it.
         if (_expanded || !_settings.ShowVolume) return;
         if (AudioDevices.GetOutputs().FirstOrDefault(d => d.IsDefault) is not { } device) return;
+        var container = AudioDevices.Find(device.Id)?.Container;
+        // A Bluetooth device that has just been announced as connected: that notice names it already.
+        if (container is { } announced && announced == _lastBluetooth.Container && _lastBluetooth.Connected
+            && DateTime.UtcNow - _lastBluetooth.At < TimeSpan.FromSeconds(5)) return;
 
+        ShowOutput(device, "", null);
+        if (_settings.ShowBluetooth && container is { } id && await BluetoothBattery.ReadAsync(id) is (true, { } battery)
+            && _transient == View.Output && OutputName.Text == device.Name)
+            ShowOutputBattery(battery);
+    }
+
+    /// <summary>A Bluetooth headset or speaker connected or went away: its name, and its battery if it reports one.</summary>
+    private async void OnDeviceConnectionChanged(string deviceId, bool connected)
+    {
+        if (!_settings.ShowBluetooth || _expanded || !AudioDevices.IsOutput(deviceId)) return;
+        if (AudioDevices.Find(deviceId) is not var (device, container)) return;
+        if (!_checkingBluetooth.Add(container)) return; // its other endpoint (e.g. hands-free) is being looked at
+        try
+        {
+            var (bluetooth, battery) = await BluetoothBattery.ReadAsync(container);
+            if (!bluetooth) return;
+            if (_lastBluetooth.Container == container && _lastBluetooth.Connected == connected
+                && DateTime.UtcNow - _lastBluetooth.At < TimeSpan.FromSeconds(5)) return;
+            _lastBluetooth = (container, connected, DateTime.UtcNow);
+            ShowOutput(device, Loc.T(connected ? "Connected" : "Disconnected"), connected ? battery : null, 3500);
+            if (!connected || battery is not null) return;
+
+            // The battery level often arrives a moment after the connection.
+            await Task.Delay(2000);
+            if ((await BluetoothBattery.ReadAsync(container)).Percent is { } later && _transient == View.Output
+                && OutputName.Text == device.Name)
+                ShowOutputBattery(later);
+        }
+        finally
+        {
+            _checkingBluetooth.Remove(container);
+        }
+    }
+
+    private void ShowOutput(AudioDevice device, string status, int? battery, int milliseconds = 2500)
+    {
         OutputGlyph.Text = device.IsHeadphones ? HeadphonesGlyphText : SpeakerGlyphText;
         OutputName.Text = device.Name;
         OutputName.ToolTip = device.Description;
-        ShowTransient(View.Output, 2500);
+        OutputStatus.Text = status;
+        ShowOutputBattery(battery);
+        ShowTransient(View.Output, milliseconds);
+    }
+
+    private void ShowOutputBattery(int? percent)
+    {
+        OutputBattery.Visibility = percent is null ? Visibility.Collapsed : Visibility.Visible;
+        if (percent is not { } value) return;
+        OutputBatteryText.Text = Loc.Percent(value / 100.0);
+        OutputBatteryText.Foreground = value <= 20 ? RedBrush : Brushes.White;
+        OutputBatteryGlyph.Level = value / 100.0;
+    }
+
+    // ---- Screenshots and notifications -------------------------------------------------------
+
+    /// <summary>Lingers while the pointer is on it, and a hover doesn't open the island over it.</summary>
+    private bool IsLingering => _transient is View.Screenshot or View.Notification;
+
+    /// <summary>A screenshot just landed on the clipboard: a small preview to open or save it.</summary>
+    private async void OnClipboardChanged()
+    {
+        if (!_settings.ShowScreenshots || _expanded || !Screenshots.IsFromScreenshotTool(WindowNative.GetClipboardOwner())) return;
+        BitmapSource? image = Screenshots.ReadClipboard();
+        // The tool may still have the clipboard open: a couple more tries.
+        for (int attempt = 0; attempt < 2 && image is null; attempt++)
+        {
+            await Task.Delay(150);
+            image = Screenshots.ReadClipboard();
+        }
+        if (image is null) return;
+
+        // A small copy for the preview, so the full image isn't kept around.
+        double scale = Math.Min(1, 128.0 / image.PixelWidth);
+        var thumbnail = new WriteableBitmap(new TransformedBitmap(image, new ScaleTransform(scale, scale)));
+        thumbnail.Freeze();
+        ScreenshotThumb.Background = new ImageBrush(thumbnail) { Stretch = Stretch.UniformToFill }.Frozen();
+        ScreenshotDetail.Text = Loc.T("ScreenshotCopied");
+        ScreenshotSaveButton.IsEnabled = ScreenshotOpenButton.IsEnabled = false;
+        ShowTransient(View.Screenshot, 6000);
+
+        _screenshotPath = await Task.Run(() => Screenshots.SaveTemporary(image));
+        ScreenshotSaveButton.IsEnabled = ScreenshotOpenButton.IsEnabled = _screenshotPath is not null;
+    }
+
+    private void OpenScreenshot()
+    {
+        if (_screenshotPath is null) return;
+        Screenshots.Open(_screenshotPath);
+        EndTransient();
+    }
+
+    private void SaveScreenshot()
+    {
+        if (_screenshotPath is null) return;
+        bool saved = Screenshots.SaveToScreenshots(_screenshotPath, Loc.T("ScreenshotTaken")) is not null;
+        ShowNotice(saved ? CheckGlyphText : "\uE783", Loc.T(saved ? "ScreenshotSaved" : "ScreenshotSaveFailed"), 2500);
+    }
+
+    /// <summary>A Windows notification, repeated on the island.</summary>
+    private void ShowNotification(IslandNotification notification)
+    {
+        if (!_settings.ShowNotifications || _expanded || _timerDone || _transient == View.Screenshot) return;
+        NotificationIcon.Source = notification.Icon;
+        NotificationBell.Visibility = notification.Icon is null ? Visibility.Visible : Visibility.Collapsed;
+        NotificationApp.Text = notification.App;
+        NotificationTitle.Text = notification.Title;
+        NotificationBody.Text = notification.Body;
+        NotificationBody.Visibility = notification.Body.Length > 0 ? Visibility.Visible : Visibility.Collapsed;
+        ShowTransient(View.Notification, 5000);
+    }
+
+    private void EndTransient()
+    {
+        _transientTimer.Stop();
+        _transient = null;
+        Refresh();
     }
 
     // ---- Microphone --------------------------------------------------------------------------
@@ -578,6 +752,34 @@ public partial class IslandWindow : Window
         if (_timer.IsPaused) return;
         _timerTick.Interval = _timer.UntilNextChange;
         _timerTick.Start();
+    }
+
+    // ---- Calls -------------------------------------------------------------------------------
+
+    /// <summary>A call app took the microphone (a call started) or let it go (it ended).</summary>
+    private void UpdateCall()
+    {
+        var app = _settings.ShowCalls ? _privacy.MicrophoneUsers.FirstOrDefault(u => CallApps.Contains(u.Exe)) : null;
+        if (app?.Exe == _call?.Exe) return;
+        _call = app;
+        _callSince = DateTime.Now;
+        if (app is not null)
+        {
+            CallName.Text = app.Name;
+            CompactCallView.ToolTip = Loc.F("InCall", app.Name);
+        }
+        Refresh();
+    }
+
+    /// <summary>The call's length, redrawn once a second while it's on screen.</summary>
+    private void UpdateCallDisplay()
+    {
+        _callTick.Stop();
+        if (_call is null || !IsVisible || _current != View.CompactCall) return;
+        var length = DateTime.Now - _callSince;
+        CallTime.Text = FormatTime(length);
+        _callTick.Interval = TimeSpan.FromMilliseconds(1005 - length.Milliseconds);
+        _callTick.Start();
     }
 
     // ---- Optimize panel ----------------------------------------------------------------------
@@ -768,6 +970,7 @@ public partial class IslandWindow : Window
         UpdateLevelBars();
         UpdateIdleLiveLine();
         UpdateTimerDisplay();
+        UpdateCallDisplay();
     }
 
     private View ChooseView()
@@ -783,19 +986,20 @@ public partial class IslandWindow : Window
         // A window reaching up under the island (a maximised browser's tabs) gets the space back: the
         // compact view shrinks to the resting tab, which shows a thin "something is live" line instead.
         if (_topWindows.IsCovered) return View.Idle;
+        if (_call is not null) return View.CompactCall;
         if (_settings.ShowMedia && _media.IsPlaying) return View.CompactMedia; // with the timer, if one runs
         return _timer.IsActive ? View.CompactTimer : View.Idle;
     }
 
     /// <summary>
-    /// The resting tab's thin line: music is playing, or a timer running, while the compact view has
+    /// The resting tab's thin line: a call, music playing or a timer running, while the compact view has
     /// stepped aside.
     /// </summary>
     private void UpdateIdleLiveLine()
     {
-        bool playing = _settings.ShowMedia && _media.IsPlaying;
-        IdleLiveLine.Visibility = _current == View.Idle && (playing || _timer.IsActive) ? Visibility.Visible : Visibility.Collapsed;
-        IdleLiveLine.Background = playing ? _accent : OrangeBrush;
+        bool call = _call is not null, playing = _settings.ShowMedia && _media.IsPlaying;
+        IdleLiveLine.Visibility = _current == View.Idle && (call || playing || _timer.IsActive) ? Visibility.Visible : Visibility.Collapsed;
+        IdleLiveLine.Background = call ? GreenBrush : playing ? _accent : OrangeBrush;
     }
 
     private static bool IsExpanded(View view) => view is View.Home or View.ExpandedMedia;
@@ -828,8 +1032,10 @@ public partial class IslandWindow : Window
     /// </summary>
     private void UpdatePrivacy()
     {
-        var microphone = _privacy.MicrophoneApps;
-        var camera = _privacy.CameraApps;
+        // The monitor also runs for the call indicator alone; the lights show only when they're on.
+        bool lights = _settings.ShowPrivacyIndicators;
+        IReadOnlyList<string> microphone = lights ? _privacy.MicrophoneApps : [];
+        IReadOnlyList<string> camera = lights ? _privacy.CameraApps : [];
         bool any = microphone.Count > 0 || camera.Count > 0;
         // In a call but muted: the app still holds the microphone, it just gets silence.
         bool muted = microphone.Count > 0 && _microphone.IsMuted;
@@ -849,12 +1055,17 @@ public partial class IslandWindow : Window
         IdleView.Margin = new Thickness(0, any ? -18 : -4, 0, 0);
         if (_current == View.Idle) MorphTo(IdleView);
         PlacePrivacyDots();
+
+        // The call view has its own marks: muted, and the camera on.
+        CallMutedMark.Visibility = _microphone.IsMuted ? Visibility.Visible : Visibility.Collapsed;
+        CallCameraDot.Visibility = _privacy.CameraApps.Count > 0 ? Visibility.Visible : Visibility.Collapsed;
+        UpdateCall();
     }
 
     private void PlacePrivacyDots()
     {
-        bool any = _privacy.MicrophoneApps.Count > 0 || _privacy.CameraApps.Count > 0;
-        PrivacyDots.Visibility = any && _current != View.CompactMedia ? Visibility.Visible : Visibility.Collapsed;
+        bool any = _settings.ShowPrivacyIndicators && (_privacy.MicrophoneApps.Count > 0 || _privacy.CameraApps.Count > 0);
+        PrivacyDots.Visibility = any && _current is not (View.CompactMedia or View.CompactCall) ? Visibility.Visible : Visibility.Collapsed;
 
         // Centred in the visible part of the resting tab and the compact timer (the gap between icon and
         // time), otherwise in the top padding. Dots outside the island's current shape are clipped, so
@@ -903,7 +1114,7 @@ public partial class IslandWindow : Window
     private void MorphTo(FrameworkElement view)
     {
         var target = RectOf(view);
-        if (_expanded && Root.IsMouseOver && !target.Contains(Mouse.GetPosition(this)))
+        if (_expanded && Root.IsMouseOver && !target.Contains(Mouse.GetPosition(Root)))
             _skirt = _skirt.IsEmpty ? _shapeTarget : Rect.Union(_skirt, _shapeTarget);
         _shapeTarget = target;
         _shapeAnimator.AnimateTo(ShapeOf(view));
@@ -914,17 +1125,29 @@ public partial class IslandWindow : Window
     private static double[] ShapeOf(FrameworkElement view) =>
         [view.Width, view.Height, Math.Min(view.Height / 2, MaxRadius), view.Margin.Top];
 
-    private Rect RectOf(FrameworkElement view) => new((Width - view.Width) / 2, view.Margin.Top, view.Width, view.Height);
+    private static Rect RectOf(FrameworkElement view) => new((BaseWidth - view.Width) / 2, view.Margin.Top, view.Width, view.Height);
 
     private void ApplyShape(double[] values)
     {
         double width = Math.Max(values[0], 0);
         double height = Math.Max(values[1], 0);
         double radius = Math.Clamp(values[2], 0, Math.Min(width, height) / 2);
-        _shape.Rect = new Rect((Width - width) / 2, values[3], width, height);
+        _shape.Rect = new Rect((BaseWidth - width) / 2, values[3], width, height);
         _shape.RadiusX = radius;
         _shape.RadiusY = radius;
         UpdateHoverBridge();
+    }
+
+    /// <summary>The window and everything in it at the chosen island size; the views keep their sizes in island units.</summary>
+    private void ApplyScale()
+    {
+        double scale = _settings.IslandScale;
+        if (scale == _scale) return;
+        _scale = scale;
+        Root.LayoutTransform = scale == 1 ? Transform.Identity : new ScaleTransform(scale, scale);
+        Width = BaseWidth * scale;
+        Height = BaseHeight * scale;
+        Dispatcher.InvokeAsync(PositionIsland, DispatcherPriority.Loaded);
     }
 
     private void UpdateHoverBridge()
@@ -1032,6 +1255,8 @@ public partial class IslandWindow : Window
         int style = GetWindowLong(handle, GWL_EXSTYLE);
         SetWindowLong(handle, GWL_EXSTYLE, style | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE);
         HwndSource.FromHwnd(handle)?.AddHook(WndProc);
+        // Windows says when the clipboard changes (no polling); only screenshots are of interest.
+        WindowNative.AddClipboardFormatListener(handle);
         PositionIsland();
     }
 
@@ -1039,6 +1264,8 @@ public partial class IslandWindow : Window
     {
         if (msg == WM_DISPLAYCHANGE || (msg == WM_SETTINGCHANGE && (int)wParam == SPI_SETWORKAREA))
             Dispatcher.InvokeAsync(PositionIsland);
+        else if (msg == WindowNative.WM_CLIPBOARDUPDATE)
+            Dispatcher.InvokeAsync(OnClipboardChanged);
         return IntPtr.Zero;
     }
 

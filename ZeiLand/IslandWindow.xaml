@@ -267,6 +267,26 @@
                            Typography.NumeralAlignment="Tabular" />
             </Grid>
 
+            <!-- A call app (Discord, Teams, Zoom…) is using the microphone: which one and for how long. -->
+            <Grid x:Name="CompactCallView" Style="{StaticResource View}" Width="210" Height="36">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Style="{StaticResource Icon}" Margin="14,0,9,0" FontSize="14" Text="&#xE717;"
+                           Foreground="{StaticResource CameraColor}" />
+                <TextBlock x:Name="CallName" Grid.Column="1" VerticalAlignment="Center" TextTrimming="CharacterEllipsis"
+                           Foreground="#E6FFFFFF" />
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="8,0,14,0" VerticalAlignment="Center">
+                    <TextBlock x:Name="CallMutedMark" Style="{StaticResource MutedMark}" Margin="0,-2,6,-2" />
+                    <Ellipse x:Name="CallCameraDot" Style="{StaticResource PrivacyDot}" Fill="{StaticResource CameraColor}"
+                             Margin="0,0,7,0" Visibility="Collapsed" />
+                    <TextBlock x:Name="CallTime" FontWeight="SemiBold" Foreground="{StaticResource CameraColor}"
+                               Typography.NumeralAlignment="Tabular" />
+                </StackPanel>
+            </Grid>
+
             <!-- Hovered while media is available: full player + system stats. -->
             <Grid x:Name="ExpandedMediaView" Style="{StaticResource View}" Width="380" Height="216">
                 <Grid Margin="18,16,18,14">
@@ -512,16 +532,72 @@
                            Margin="0,0,16,0" FontSize="11" Foreground="{StaticResource TertiaryText}" />
             </Grid>
 
-            <!-- Transient: another output device became the default. -->
-            <Grid x:Name="OutputView" Style="{StaticResource View}" Width="300" Height="40">
+            <!-- Transient: another output device became the default, or a Bluetooth one connected or went
+                 away (with its battery, when it reports one). -->
+            <Grid x:Name="OutputView" Style="{StaticResource View}" Width="320" Height="40">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
                 <TextBlock x:Name="OutputGlyph" Style="{StaticResource Icon}" Margin="17,0,0,0" HorizontalAlignment="Left" />
-                <TextBlock x:Name="OutputName" Margin="46,0,18,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                <TextBlock x:Name="OutputName" Margin="46,0,12,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                <StackPanel Grid.Column="1" Orientation="Horizontal" Margin="0,0,16,0" VerticalAlignment="Center">
+                    <TextBlock x:Name="OutputStatus" FontSize="11" Foreground="{StaticResource TertiaryText}" VerticalAlignment="Center" />
+                    <StackPanel x:Name="OutputBattery" Orientation="Horizontal" Margin="10,0,0,0" Visibility="Collapsed">
+                        <TextBlock x:Name="OutputBatteryText" FontWeight="SemiBold" Margin="0,0,7,0" VerticalAlignment="Center" />
+                        <controls:BatteryGlyph x:Name="OutputBatteryGlyph" Width="22" Height="11" VerticalAlignment="Center" />
+                    </StackPanel>
+                </StackPanel>
             </Grid>
 
             <!-- A word from the app itself, e.g. an update being installed. -->
             <Grid x:Name="NoticeView" Style="{StaticResource View}" Width="300" Height="40">
                 <TextBlock x:Name="NoticeGlyph" Style="{StaticResource Icon}" Margin="17,0,0,0" HorizontalAlignment="Left" />
                 <TextBlock x:Name="NoticeText" Margin="46,0,18,0" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+            </Grid>
+
+            <!-- Transient: a screenshot was just taken (Win+Shift+S, Snipping Tool), to open or save. It stays
+                 while the pointer is on it. -->
+            <Grid x:Name="ScreenshotView" Style="{StaticResource View}" Width="344" Height="60">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+                <Border x:Name="ScreenshotThumb" Width="64" Height="40" CornerRadius="7" Margin="12,0,12,0"
+                        Background="{StaticResource Track}" Cursor="Hand" ToolTip="{DynamicResource Open}" />
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{DynamicResource ScreenshotTaken}" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                    <TextBlock x:Name="ScreenshotDetail" Margin="0,1,0,0" FontSize="11" Foreground="{StaticResource SecondaryText}"
+                               TextTrimming="CharacterEllipsis" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="8,0,12,0" VerticalAlignment="Center">
+                    <Button x:Name="ScreenshotOpenButton" Style="{StaticResource PillButton}" MinWidth="52" Content="{DynamicResource Open}" />
+                    <Button x:Name="ScreenshotSaveButton" Style="{StaticResource PillButton}" MinWidth="62" Margin="6,0,0,0"
+                            Content="{DynamicResource Save}" />
+                </StackPanel>
+            </Grid>
+
+            <!-- Transient: a Windows notification repeated on the island (when turned on). It stays while the
+                 pointer is on it; a click puts it away. -->
+            <Grid x:Name="NotificationView" Style="{StaticResource View}" Width="360" Height="62">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <!-- The app's logo; a bell for apps that have none to give. -->
+                <Grid Width="30" Height="30" Margin="15,0,12,0" VerticalAlignment="Center">
+                    <TextBlock x:Name="NotificationBell" Style="{StaticResource Icon}" FontSize="17" Text="&#xEA8F;"
+                               HorizontalAlignment="Center" />
+                    <Image x:Name="NotificationIcon" RenderOptions.BitmapScalingMode="HighQuality" />
+                </Grid>
+                <StackPanel Grid.Column="1" Margin="0,0,18,0" VerticalAlignment="Center">
+                    <TextBlock x:Name="NotificationApp" FontSize="10.5" Foreground="{StaticResource TertiaryText}"
+                               TextTrimming="CharacterEllipsis" />
+                    <TextBlock x:Name="NotificationTitle" FontWeight="SemiBold" TextTrimming="CharacterEllipsis" />
+                    <TextBlock x:Name="NotificationBody" FontSize="11.5" Foreground="{StaticResource SecondaryText}"
+                               TextTrimming="CharacterEllipsis" />
+                </StackPanel>
             </Grid>
 
             <!-- A countdown ended: stays until dismissed. -->

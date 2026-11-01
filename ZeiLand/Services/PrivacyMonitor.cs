@@ -6,6 +6,10 @@ using ZeiLand.Native;
 
 namespace ZeiLand.Services;
 
+/// <param name="Exe">The executable's name without ".exe", e.g. "Discord" or "ms-teams".</param>
+/// <param name="Name">What to show for it, e.g. "Microsoft Teams".</param>
+internal sealed record AppUse(string Exe, string Name);
+
 /// <summary>
 /// Which apps are using the microphone or the camera right now. Microphone: processes with an active
 /// recording stream in Core Audio (what the volume mixer sees). Camera: processes streaming from a camera,
@@ -32,6 +36,9 @@ internal sealed class PrivacyMonitor : IDisposable
     public IReadOnlyList<string> MicrophoneApps { get; private set; } = [];
     public IReadOnlyList<string> CameraApps { get; private set; } = [];
 
+    /// <summary>The apps using the microphone, with their executables (to tell a call app from the rest).</summary>
+    public IReadOnlyList<AppUse> MicrophoneUsers { get; private set; } = [];
+
     /// <summary>Starts or stops watching; stopped, it costs nothing and reports no apps.</summary>
     public bool Enabled
     {
@@ -49,6 +56,7 @@ internal sealed class PrivacyMonitor : IDisposable
             {
                 Stop();
                 MicrophoneApps = CameraApps = [];
+                MicrophoneUsers = [];
                 Changed?.Invoke();
             }
         }
@@ -68,22 +76,33 @@ internal sealed class PrivacyMonitor : IDisposable
     private void Report(IReadOnlyCollection<int> processIds, bool camera)
     {
         List<string> microphoneNames, cameraNames;
+        List<AppUse> microphoneUsers;
         lock (_lock)
         {
             if (camera) _cameraIds = processIds;
             else _microphoneIds = processIds;
             microphoneNames = Names(_microphoneIds);
             cameraNames = Names(_cameraIds);
+            microphoneUsers = Users(_microphoneIds);
         }
         _dispatcher.InvokeAsync(() =>
         {
             if (!Enabled) return;
-            if (microphoneNames.SequenceEqual(MicrophoneApps) && cameraNames.SequenceEqual(CameraApps)) return;
+            if (microphoneNames.SequenceEqual(MicrophoneApps) && cameraNames.SequenceEqual(CameraApps)
+                && microphoneUsers.SequenceEqual(MicrophoneUsers)) return;
             MicrophoneApps = microphoneNames;
             CameraApps = cameraNames;
+            MicrophoneUsers = microphoneUsers;
             Changed?.Invoke();
         });
     }
+
+    private List<AppUse> Users(IReadOnlyCollection<int> processIds) => processIds
+        .Where(id => id != 0 && id != Environment.ProcessId)
+        .Select(id => new AppUse(WindowNative.GetProcessPath(id) is { } path ? Path.GetFileNameWithoutExtension(path) : "",
+            DisplayName(id)))
+        .Distinct()
+        .ToList();
 
     private List<string> Names(IReadOnlyCollection<int> processIds) => processIds
         .Where(id => id != 0 && id != Environment.ProcessId)
