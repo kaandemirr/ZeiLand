@@ -11,7 +11,7 @@
     <AssemblyName>ZeiLand</AssemblyName>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Assets\island.ico</ApplicationIcon>
-    <Version>0.6.3</Version>
+    <Version>0.6.4</Version>
 
     <!-- Keep the resident footprint small: workstation, non-concurrent GC (no background GC thread). -->
     <ServerGarbageCollection>false</ServerGarbageCollection>
